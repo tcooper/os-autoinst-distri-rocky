@@ -1,0 +1,7 @@
+Last metadata expiration check: 0:00:01 ago on Sun 29 Aug 2021 11:31:59 PM PDT.
+Rocky Linux 8 - AppStream
+Name         Stream       Profiles   Summary              
+llvm-toolset rhel8 [d][e] common [d] LLVM                 
+virt         rhel [d][e]  common [d] Virtualization module
+
+Hint: [d]efault, [e]nabled, [x]disabled, [i]nstalled

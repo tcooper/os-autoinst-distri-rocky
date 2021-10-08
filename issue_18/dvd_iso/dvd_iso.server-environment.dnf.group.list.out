@@ -1,0 +1,47 @@
+Loaded plugins: builddep, changelog, config-manager, copr, debug, debuginfo-install, download, generate_completion_cache, groups-manager, kpatch, needs-restarting, playground, repoclosure, repodiff, repograph, repomanage, reposync
+DNF version: 4.4.2
+cachedir: /var/cache/dnf
+User-Agent: constructed: 'libdnf (Rocky Linux 8.4; generic; Linux.x86_64)'
+repo: downloading from remote: appstream
+Rocky Linux 8 - AppStream                       3.2 MB/s | 8.7 MB     00:02    
+appstream: using metadata from Tue 24 Aug 2021 07:04:19 PM UTC.
+repo: downloading from remote: baseos
+Rocky Linux 8 - BaseOS                          3.5 MB/s | 5.6 MB     00:01    
+baseos: using metadata from Tue 24 Aug 2021 07:04:20 PM UTC.
+repo: downloading from remote: extras
+Rocky Linux 8 - Extras                          5.2 kB/s | 4.3 kB     00:00    
+extras: using metadata from Tue 24 Aug 2021 07:04:19 PM UTC.
+repo: downloading from remote: epel-modular
+countme: event triggered for epel-modular: bucket 1
+Extra Packages for Enterprise Linux Modular 8 - 308 kB/s | 931 kB     00:03    
+epel-modular: using metadata from Thu 26 Aug 2021 09:20:50 PM UTC.
+repo: downloading from remote: epel
+countme: no event for epel: budget to spend: 1
+Extra Packages for Enterprise Linux 8 - x86_64  4.3 MB/s |  10 MB     00:02    
+epel: using metadata from Sun 29 Aug 2021 06:34:28 PM UTC.
+Completion plugin: Generating completion cache...
+Available Environment Groups:
+   Server with GUI (graphical-server-environment)
+   Minimal Install (minimal-environment)
+   Workstation (workstation-product-environment)
+   KDE Plasma Workspaces (kde-desktop-environment)
+   Virtualization Host (virtualization-host-environment)
+   Custom Operating System (custom-environment)
+Installed Environment Groups:
+   Server (server-product-environment)
+Installed Groups:
+   Container Management (container-management)
+   Headless Management (headless-management)
+Available Groups:
+   .NET Core Development (dotnet-core)
+   RPM Development Tools (rpm-development-tools)
+   Development Tools (development)
+   Graphical Administration Tools (graphical-admin-tools)
+   Legacy UNIX Compatibility (legacy-unix)
+   Network Servers (network-server)
+   Scientific Support (scientific)
+   Security Tools (security-tools)
+   Smart Card Support (smart-card)
+   System Tools (system-tools)
+   Fedora Packager (fedora-packager)
+   Xfce (xfce-desktop)

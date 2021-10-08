@@ -1,0 +1,36 @@
+Loaded plugins: builddep, changelog, config-manager, copr, debug, debuginfo-install, download, generate_completion_cache, groups-manager, kpatch, needs-restarting, playground, product-id, repoclosure, repodiff, repograph, repomanage, reposync, uploadprofile
+DNF version: 4.4.2
+cachedir: /var/cache/dnf
+User-Agent: constructed: 'libdnf (Rocky Linux 8.4; generic; Linux.x86_64)'
+repo: downloading from remote: appstream
+Rocky Linux 8 - AppStream                       2.5 MB/s | 9.1 MB     00:03    
+appstream: using metadata from Fri 01 Oct 2021 05:57:30 PM EDT.
+repo: downloading from remote: baseos
+Rocky Linux 8 - BaseOS                          3.3 MB/s | 7.5 MB     00:02    
+baseos: using metadata from Fri 01 Oct 2021 05:57:34 PM EDT.
+repo: downloading from remote: extras
+Rocky Linux 8 - Extras                          8.3 kB/s |  11 kB     00:01    
+extras: using metadata from Fri 01 Oct 2021 05:57:30 PM EDT.
+Completion plugin: Generating completion cache...
+Available Environment Groups:
+   Server (server-product-environment)
+   Minimal Install (minimal-environment)
+   Workstation (workstation-product-environment)
+   Virtualization Host (virtualization-host-environment)
+   Custom Operating System (custom-environment)
+Installed Environment Groups:
+   Server with GUI (graphical-server-environment)
+Installed Groups:
+   Container Management (container-management)
+   Headless Management (headless-management)
+Available Groups:
+   .NET Core Development (dotnet-core)
+   RPM Development Tools (rpm-development-tools)
+   Development Tools (development)
+   Graphical Administration Tools (graphical-admin-tools)
+   Legacy UNIX Compatibility (legacy-unix)
+   Network Servers (network-server)
+   Scientific Support (scientific)
+   Security Tools (security-tools)
+   Smart Card Support (smart-card)
+   System Tools (system-tools)
