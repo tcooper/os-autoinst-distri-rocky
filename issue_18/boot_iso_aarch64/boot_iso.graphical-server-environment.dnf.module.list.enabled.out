@@ -1,0 +1,14 @@
+Last metadata expiration check: 0:00:03 ago on Thu 04 Nov 2021 06:16:43 PM EDT.
+Rocky Linux 8 - AppStream
+Name               Stream       Profiles            Summary                                                                                                                                                                                                                          
+container-tools    rhel8 [d][e] common [d]          Most recent (rolling) versions of podman, buildah, skopeo, runc, conmon, runc, conmon, CRIU, Udica, etc as well as dependencies such as container-selinux built and tested together, and updated as frequently as every 12 weeks.
+llvm-toolset       rhel8 [d][e] common [d]          LLVM                                                                                                                                                                                                                             
+perl               5.26 [d][e]  common [d], minimal Practical Extraction and Report Language                                                                                                                                                                                         
+perl-DBD-SQLite    1.58 [d][e]  common [d]          SQLite DBI driver                                                                                                                                                                                                                
+perl-DBI           1.641 [d][e] common [d]          A database access API for Perl                                                                                                                                                                                                   
+perl-IO-Socket-SSL 2.066 [d][e] common [d]          Perl library for transparent TLS                                                                                                                                                                                                 
+perl-libwww-perl   6.34 [d][e]  common [d]          A Perl interface to the World-Wide Web                                                                                                                                                                                           
+python36           3.6 [d][e]   build, common [d]   Python programming language, version 3.6                                                                                                                                                                                         
+virt               rhel [d][e]  common [d]          Virtualization module                                                                                                                                                                                                            
+
+Hint: [d]efault, [e]nabled, [x]disabled, [i]nstalled

@@ -1,0 +1,9 @@
+NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sr0          11:0    1  1024M  0 rom  
+vda         252:0    0   200G  0 disk 
+├─vda1      252:1    0   600M  0 part /boot/efi
+├─vda2      252:2    0     1G  0 part /boot
+└─vda3      252:3    0 198.4G  0 part 
+  ├─rl-root 253:0    0    70G  0 lvm  /
+  ├─rl-swap 253:1    0    20G  0 lvm  [SWAP]
+  └─rl-home 253:2    0 108.4G  0 lvm  /home
