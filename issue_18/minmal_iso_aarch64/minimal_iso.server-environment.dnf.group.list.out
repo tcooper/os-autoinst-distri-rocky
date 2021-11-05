@@ -1,0 +1,32 @@
+Loaded plugins: builddep, changelog, config-manager, copr, debug, debuginfo-install, download, generate_completion_cache, groups-manager, kpatch, needs-restarting, playground, repoclosure, repodiff, repograph, repomanage, reposync
+DNF version: 4.4.2
+cachedir: /var/cache/dnf
+User-Agent: constructed: 'libdnf (Rocky Linux 8.4; generic; Linux.aarch64)'
+repo: downloading from remote: appstream
+Rocky Linux 8 - AppStream                       3.5 MB/s | 8.1 MB     00:02    
+appstream: using metadata from Thu 04 Nov 2021 03:51:01 AM EDT.
+repo: downloading from remote: baseos
+Rocky Linux 8 - BaseOS                           12 MB/s | 6.9 MB     00:00    
+baseos: using metadata from Thu 04 Nov 2021 03:51:02 AM EDT.
+repo: downloading from remote: extras
+Rocky Linux 8 - Extras                          1.4 MB/s | 331 kB     00:00    
+extras: using metadata from Thu 04 Nov 2021 03:50:59 AM EDT.
+Completion plugin: Generating completion cache...
+Available Environment Groups:
+   Server with GUI (graphical-server-environment)
+   Minimal Install (minimal-environment)
+   Custom Operating System (custom-environment)
+Installed Environment Groups:
+   Server (server-product-environment)
+Installed Groups:
+   Headless Management (headless-management)
+Available Groups:
+   Container Management (container-management)
+   RPM Development Tools (rpm-development-tools)
+   Development Tools (development)
+   Legacy UNIX Compatibility (legacy-unix)
+   Network Servers (network-server)
+   Scientific Support (scientific)
+   Security Tools (security-tools)
+   Smart Card Support (smart-card)
+   System Tools (system-tools)

@@ -19,11 +19,14 @@ Only `x85_64` results are included at this time.
 | Rocky-8.4-x86_64-dvd1.iso       |   minimal              | media             | VirtualBox VM      | 0                 | 0                   | 0                    | 375             |
 | Rocky-8.4-x86_64-dvd1.iso       |   minimal              | media / efi       | VirtualBox VM      | 0                 | 0                   | 0                    | 412             |
 | | | | |
+| Rocky-8.4-aarch64-boot.iso      | \* graphical-server    | network           | Libvirt VM         | 9                 | 0                   | 0                    | 1239            |
 | Rocky-8.4-x86_64-boot.iso       | \* graphical-server    | network           | VirtualBox VM      | 0                 | 0                   | 0                    | 357             |
 | Rocky-8.4-x86_64-minimal.iso    |   graphical-server     | network           | VirtualBox VM      | 10                | 0                   | 0                    | 1366            |
+| Rocky-8.4-aarch64-dvd1.iso      | \* graphical-server    | media             | Libvirt VM         | 9                 | 0                   | 0                    | 1241            |
 | Rocky-8.4-x86_64-dvd1.iso       | \* graphical-server    | media             | VirtualBox VM      | 10                | 0                   | 0                    | 1367            |
 | | | | |
 | Rocky-8.4-x86_64-boot.iso       |   server               | network           | VirtualBox VM      | 0                 | 0                   | 0                    | 357             |
+| Rocky-8.4-aarch64-minimal.iso   | \* server              | media             | Libvirt VM         | 0                 | 0                   | 0                    | 465             |
 | Rocky-8.4-x86_64-minimal.iso    | \* server              | media             | VirtualBox VM      | 0                 | 0                   | 0                    | 457             |
 | Rocky-8.4-x86_64-dvd1.iso       |   server               | media             | VirtualBox VM      | 5                 | 0                   | 0                    | 644             |
 | | | | |
