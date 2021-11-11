@@ -1,0 +1,6 @@
+Last metadata expiration check: 0:00:02 ago on Thu 11 Nov 2021 11:20:30 AM EST.
+Rocky Linux 8 - AppStream
+Name            Stream       Profiles   Summary                                                                                                                                                                                                                          
+container-tools rhel8 [d][e] common [d] Most recent (rolling) versions of podman, buildah, skopeo, runc, conmon, runc, conmon, CRIU, Udica, etc as well as dependencies such as container-selinux built and tested together, and updated as frequently as every 12 weeks.
+
+Hint: [d]efault, [e]nabled, [x]disabled, [i]nstalled

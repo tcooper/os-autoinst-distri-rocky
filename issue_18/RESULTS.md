@@ -11,23 +11,30 @@ Only `x85_64` results are included at this time.
 
 | ISO                             | PACKAGE_SET            | Install Source    | Install Method     | Enabled Modules   | Disabled Modules    | Installed Modules    | RPM packages    |
 | :------------------------------ | :--------------------- | :---------------- | :----------------- | ----------------: | ------------------: | -------------------: | --------------: |
+| Rocky-8.4-aarch64-boot.iso      |   minimal              | network           | Libvirt VM         | 0                 | 0                   | 0                    | 407             |
 | Rocky-8.4-x86_64-boot.iso       |   minimal              | network           | VirtualBox VM      | 0                 | 0                   | 0                    | 374             |
 | Rocky-8.4-x86_64-boot.iso       |   minimal              | network / efi     | VirtualBox VM      | 0                 | 0                   | 0                    | 411             |
+| Rocky-8.4-aarch64-minimal.iso   |   minimal              | media             | Libvirt VM         | 0                 | 0                   | 0                    | 369             |
 | Rocky-8.4-x86_64-minimal.iso    |   minimal              | media             | VirtualBox VM      | 0                 | 0                   | 0                    | 357             |
 | Rocky-8.4-x86_64-minimal.iso    |   minimal              | media / efi       | VirtualBox VM      | 4                 | 0                   | 0                    | 373             |
+| Rocky-8.4-aarch64-minimal.iso   |   minimal              | network           | Libvirt VM         | 0                 | 0                   | 0                    | 407             |
 | Rocky-8.4-x86_64-minimal.iso    |   minimal              | network           | VirtualBox VM      | 0                 | 0                   | 0                    | 347             |
+| Rocky-8.4-aarch64-dvd1.iso      |   minimal              | media             | Libvirt VM         | 0                 | 0                   | 0                    | 408             |
 | Rocky-8.4-x86_64-dvd1.iso       |   minimal              | media             | VirtualBox VM      | 0                 | 0                   | 0                    | 375             |
 | Rocky-8.4-x86_64-dvd1.iso       |   minimal              | media / efi       | VirtualBox VM      | 0                 | 0                   | 0                    | 412             |
 | | | | |
 | Rocky-8.4-aarch64-boot.iso      | \* graphical-server    | network           | Libvirt VM         | 9                 | 0                   | 0                    | 1239            |
 | Rocky-8.4-x86_64-boot.iso       | \* graphical-server    | network           | VirtualBox VM      | 0                 | 0                   | 0                    | 357             |
+| Rocky-8.4-aarch64-minimal.iso   |   graphical-server     | network           | Libvirt VM         | 9                 | 0                   | 0                    | 1239            |
 | Rocky-8.4-x86_64-minimal.iso    |   graphical-server     | network           | VirtualBox VM      | 10                | 0                   | 0                    | 1366            |
 | Rocky-8.4-aarch64-dvd1.iso      | \* graphical-server    | media             | Libvirt VM         | 9                 | 0                   | 0                    | 1241            |
 | Rocky-8.4-x86_64-dvd1.iso       | \* graphical-server    | media             | VirtualBox VM      | 10                | 0                   | 0                    | 1367            |
 | | | | |
+| Rocky-8.4-aarch64-boot.iso      |   server               | network           | Libvirt VM         | 0                 | 0                   | 0                    | 603             |
 | Rocky-8.4-x86_64-boot.iso       |   server               | network           | VirtualBox VM      | 0                 | 0                   | 0                    | 357             |
 | Rocky-8.4-aarch64-minimal.iso   | \* server              | media             | Libvirt VM         | 0                 | 0                   | 0                    | 465             |
 | Rocky-8.4-x86_64-minimal.iso    | \* server              | media             | VirtualBox VM      | 0                 | 0                   | 0                    | 457             |
+| Rocky-8.4-aarch64-dvd1.iso      |   server               | media             | Libvirt VM         | 0                 | 0                   | 0                    | 605             |
 | Rocky-8.4-x86_64-dvd1.iso       |   server               | media             | VirtualBox VM      | 5                 | 0                   | 0                    | 644             |
 | | | | |
 | Rocky-8.4-x86_64-minimal.iso    |   virtualization-host  | network           | VirtualBox VM      | 3                 | 0                   | 0                    | 688             |
@@ -42,6 +49,7 @@ Only `x85_64` results are included at this time.
 
 - Install from `Rocky-8.4-x86_64-boot.iso` is inherently a network install so the packages installed over time can change both in number and in `NEVRA`.
 - Install in EFI mode consistently pulls in more packages.
+- The package sets `virtualization-host` and `workstation` are not available for aarch64.
 
 
 ## Collection Sequence
