@@ -1106,6 +1106,34 @@
                 "DESKTOP": "false"
             }
         },
+        "mediakit_fileconflicts": {
+            "profiles": {
+                "rocky-dvd-iso-aarch64-*-aarch64": 10,
+                "rocky-dvd-iso-x86_64-*-64bit": 10
+            },
+            "settings": {
+                "BOOTFROM": "c",
+                "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
+                "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%",
+                "POSTINSTALL": "mediakit_fileconflicts",
+                "ROOT_PASSWORD": "weakpassword",
+                "USER_LOGIN": "false"
+            }
+        },
+        "mediakit_repoclosure": {
+            "profiles": {
+                "rocky-dvd-iso-aarch64-*-aarch64": 10,
+                "rocky-dvd-iso-x86_64-*-64bit": 10
+            },
+            "settings": {
+                "BOOTFROM": "c",
+                "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
+                "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%",
+                "POSTINSTALL": "mediakit_repoclosure",
+                "ROOT_PASSWORD": "weakpassword",
+                "USER_LOGIN": "false"
+            }
+        },
         "memtest": {
             "profiles": {
                 "rocky-universal-aarch64-*-aarch64": 30,

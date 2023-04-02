@@ -9,7 +9,7 @@ sub run {
     # mount the ISO there
     assert_script_run "mount /dev/cdrom /mnt/iso";
     # run the check
-    assert_script_run "dnf repoclosure --repofrompath testdeps,/mnt/iso --repo testdeps";
+    assert_script_run "dnf repoclosure --repofrompath AppStream,/mnt/iso/AppStream --repo AppStream --repofrompath BaseOS,/mnt/iso/BaseOS --repo BaseOS";
 }
 
 sub test_flags {
