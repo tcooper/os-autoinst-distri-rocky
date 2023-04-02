@@ -60,8 +60,8 @@ sub run {
         $error = "anaconda_text_error";
     }
 
-    if (get_var("DISTRI") eq "rocky") {
-        # Activate Network
+    if (get_var("DISTRI") eq "rocky" && (get_version_major() < 9)) {
+        # Activate Network in Rocky Linux 8
         run_with_error_check(sub { console_type_wait($spoke_number{"network"} . "\n") }, $error);
         console_type_wait("2\n");    # Configure device
         console_type_wait("7\n");    # Connect automatically after reboot
@@ -70,15 +70,15 @@ sub run {
         sleep 10;
         console_type_wait("r\n");    # Refresh
         console_type_wait("c\n");    # Continue
-
-        # Software Selection
-        run_with_error_check(sub { console_type_wait($spoke_number{"swselection"} . "\n") }, $error);
-        console_type_wait("2\n");    # Server
-        console_type_wait("c\n");    # Continue
-        console_type_wait("c\n");    # Continue
-        sleep 10;
-        console_type_wait("r\n");    # Refresh
     }
+
+    # Software Selection
+    run_with_error_check(sub { console_type_wait($spoke_number{"swselection"} . "\n") }, $error);
+    console_type_wait("2\n");    # Server
+    console_type_wait("c\n");    # Continue
+    console_type_wait("c\n");    # Continue
+    sleep 10;
+    console_type_wait("r\n");    # Refresh
 
     # Set timezone
     run_with_error_check(sub { console_type_wait($spoke_number{"timezone"} . "\n") }, $error);
@@ -105,10 +105,15 @@ sub run {
     console_type_wait("1\n");    # create new
     console_type_wait("3\n");    # set username
     console_type_wait("$username\n");
+    # from Rocky 9 onwards 'use password' is default
+    if (get_var("DISTRI") eq "rocky" && (get_version_major() < 9)) {
+        # typing "4\n" on abrt screen causes system to reboot, so be careful
+        run_with_error_check(sub { console_type_wait("4\n") }, $error);    # use password
+    }
     console_type_wait("5\n");    # set password
     console_type_wait("$userpwd\n");
     console_type_wait("$userpwd\n");
-    console_type_wait("6\n");    # make him an administrator
+    console_type_wait("6\n");    # make user an administrator
     console_type_wait("c\n", 7);
 
     my $counter = 0;
