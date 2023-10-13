@@ -25,6 +25,7 @@ sub _pxe_setup {
     assert_script_run "printf 'dhcp-match=set:efi-x86_64,option:client-arch,7\ndhcp-match=set:efi-x86_64,option:client-arch,9\ndhcp-match=set:bios,option:client-arch,0\ndhcp-match=set:efi-aarch64,option:client-arch,11\ndhcp-match=set:ppc64,option:client-arch,12\ndhcp-match=set:ppc64,option:client-arch,13\ndhcp-boot=tag:efi-x86_64,\"shim.efi\"\ndhcp-boot=tag:bios,\"pxelinux.0\"\ndhcp-boot=tag:efi-aarch64,\"grubaa64.efi\"\ndhcp-boot=tag:ppc64,\"boot/grub2/powerpc-ieee1275/core.elf\"\n' >> /etc/dnsmasq.conf";
     # install and configure bootloaders
     my $ourversion = get_var("CURRREL");
+    my $dnfreleasever = get_var("DNF_RELEASEVER");
     my $testversion = get_var("RELEASE");
     assert_script_run "mkdir -p /var/tmp/rocky";
     my $arch = get_var("ARCH");
@@ -42,7 +43,11 @@ sub _pxe_setup {
         assert_script_run "cd /var/tmp; dnf download rocky-release rocky-repos rocky-gpg-keys", 60;
         assert_script_run "rpm --root=/var/tmp/rocky --nodeps -i /var/tmp/*.rpm", 60;
         #assert_script_run "sed -i /var/tmp/rocky/etc/yum.repos.d/Rocky-*.repo -e 's/repo=/repo=rocky-/g'", 60;
-        assert_script_run "dnf -y --releasever=$ourversion --refresh --installroot=/var/tmp/rocky install shim-x64 grub2-efi-x64", 1800;
+        if (get_var("DNF_RELEASEVER")) {
+            assert_script_run "dnf -y --releasever=$dnfreleasever --refresh --installroot=/var/tmp/rocky install shim-x64 grub2-efi-x64", 1800;
+        } else {
+            assert_script_run "dnf -y --releasever=$ourversion --refresh --installroot=/var/tmp/rocky install shim-x64 grub2-efi-x64", 1800;
+        }
 
         # copy bootloader files to tftp root
         assert_script_run "cp /usr/share/syslinux/{pxelinux.0,vesamenu.c32,ldlinux.c32,libcom32.c32,libutil.c32} /var/lib/tftpboot";
