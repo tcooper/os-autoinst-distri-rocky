@@ -28,7 +28,14 @@ sub run {
     # that have not been previously installed.
     assert_and_click 'cockpit_updates_all_install';
     my $run = 0;
-    while ($run < 60) {
+    # Upstream typically runs openQA against composes which have ISOs with all
+    # packages from compose. The only update they apply in this test is usually
+    # the pandoc-common package which they installed an empty package for earlier
+    # in prepare_test_packages(). We typically are testing with a release ISO
+    # and currently production repos. This means we can have a lot more packages
+    # to install here and the installation may take quite some time before it's
+    # complete and we'll be able to match cockpit_updates_updated needle.
+    while ($run < 120) {
         # When Cockpit packages are also included in the updates
         # the user is forced to reconnect, i.e. to restart the Web Application
         # and relog for further interaction. We will check if reconnection is
