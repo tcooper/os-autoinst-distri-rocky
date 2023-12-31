@@ -30,7 +30,7 @@ sub run {
     my $run = 0;
     # Upstream typically runs openQA against composes which have ISOs with all
     # packages from compose. The only update they apply in this test is usually
-    # the pandoc-common package which they installed an empty package for earlier
+    # the acpica-tools package which they installed an empty package for earlier
     # in prepare_test_packages(). We typically are testing with a release ISO
     # and currently production repos. This means we can have a lot more packages
     # to install here and the installation may take quite some time before it's
