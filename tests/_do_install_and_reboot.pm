@@ -65,6 +65,9 @@ sub _do_root_and_user {
     # Check username (and hence keyboard layout) if non-English
     if (get_var('LANGUAGE')) {
         assert_screen "anaconda_install_user_created";
+        if (check_screen "anaconda_install_weak_password") {
+            assert_and_click "anaconda_spoke_done";
+        }
     }
 }
 
@@ -141,6 +144,7 @@ sub run {
     push(@actions, 'abrt') if (get_var("ABRT", '') eq "system");
     push(@actions, 'rootpw') if (get_var("INSTALLER_NO_ROOT"));
     push(@actions, 'stagingrepos') if (get_var("DNF_CONTENTDIR"));
+    push(@actions, 'releasever') if (get_var("DNF_RELEASEVER"));
     # memcheck test doesn't need to reboot at all. Rebooting from GUI
     # for lives is unreliable. And if we're already doing something
     # else at a console, we may as well reboot from there too
@@ -201,6 +205,9 @@ sub run {
             script_run 'sed -i -e "s/^mirrorlist/#mirrorlist/g;s/^#baseurl/baseurl/g" ' . $mount . '/etc/yum.repos.d/rocky-extras.repo';
         }
         assert_script_run 'printf "stg/rocky\n" > ' . $mount . '/etc/dnf/vars/contentdir';
+    }
+    if (grep { $_ eq 'releasever' } @actions) {
+        assert_script_run 'printf "%s\n" "' . get_var("DNF_RELEASEVER") . '" > ' . $mount . '/etc/dnf/vars/releasever';
     }
     type_string "reboot\n" if (grep { $_ eq 'reboot' } @actions);
 }
