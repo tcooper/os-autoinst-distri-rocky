@@ -1,0 +1,20 @@
+{
+  "area": [
+    {
+      "type": "match",
+      "height": 24,
+      "click_point": {
+        "ypos": 12,
+        "xpos": 28.5
+      },
+      "width": 57,
+      "xpos": 672,
+      "ypos": 421
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "cockpit_updates_restart_ignore"
+  ]
+}
