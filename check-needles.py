@@ -2,9 +2,9 @@
 
 # Copyright Red Hat
 #
-# This file is part of os-autoinst-distri-fedora.
+# This file is part of os-autoinst-distri-rocky.
 #
-# os-autoinst-distri-fedora is free software; you can redistribute it
+# os-autoinst-distri-rocky is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation, either version 2 of
 # the License, or (at your option) any later version.
@@ -57,7 +57,7 @@ for testpath in testpaths:
 # now let's do some whitelisting, for awkward cases where we know that
 # we concatenate string literals and stuff
 # versioned backgrounds and release IDs
-for rel in range(30, 100):
+for rel in ['8.7','8.8','8.9','8.10','9.0','9.1','9.2','9.3','9.4']:
     testliterals.append(f"{rel}_background")
     testliterals.append(f"version_{rel}_ident")
 # anaconda id needles, using tell_source
