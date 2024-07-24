@@ -1,8 +1,8 @@
 # Copyright Red Hat
 #
-# This file is part of os-autoinst-distri-fedora.
+# This file is part of os-autoinst-distri-rocky.
 #
-# os-autoinst-distri-fedora is free software; you can redistribute it
+# os-autoinst-distri-rocky is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation, either version 2 of
 # the License, or (at your option) any later version.
@@ -94,9 +94,10 @@ def test_generate_job_templates():
     # we should get one template per profile in merged input
     assert len(templates) == 8
     for template in templates:
-        assert template['group_name'] in ['fedora', 'Fedora PowerPC', 'Fedora AArch64',
-                                          'Fedora Updates', 'Fedora PowerPC Updates',
-                                          'Fedora AArch64 Updates']
+        assert template['group_name'] in ['Rocky', 'Rocky AArch64', 'Rocky PowerPC',
+                                          'Rocky s390x', 'Rocky Updates',
+                                          'Rocky AArch64 Updates', 'Rocky PowerPC Updates',
+                                          'Rocky s390x Updates']
         assert template['machine_name'] in list(machines.keys())
         assert isinstance(template['prio'], int)
         for item in ('arch', 'distri', 'flavor', 'version'):

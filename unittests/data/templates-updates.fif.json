@@ -1,35 +1,35 @@
 {
     "Products": {
-        "fedora-updates-server-ppc64le-*": {
+        "rocky-updates-server-ppc64le-*": {
             "arch": "ppc64le",
-            "distri": "fedora",
+            "distri": "rocky",
             "flavor": "updates-server",
             "settings": {},
             "version": "*"
         },
-        "fedora-updates-server-x86_64-*": {
+        "rocky-updates-server-x86_64-*": {
             "arch": "x86_64",
-            "distri": "fedora",
+            "distri": "rocky",
             "flavor": "updates-server",
             "settings": {},
             "version": "*"
         }
     },
     "Profiles": {
-        "fedora-updates-server-ppc64le-*-ppc64le": {
+        "rocky-updates-server-ppc64le-*-ppc64le": {
             "machine": "ppc64le",
-            "product": "fedora-updates-server-ppc64le-*"
+            "product": "rocky-updates-server-ppc64le-*"
         },
-        "fedora-updates-server-x86_64-*-64bit": {
+        "rocky-updates-server-x86_64-*-64bit": {
             "machine": "64bit",
-            "product": "fedora-updates-server-x86_64-*"
+            "product": "rocky-updates-server-x86_64-*"
         }
     },
     "TestSuites": {
         "advisory_boot": {
             "profiles": {
-                "fedora-updates-server-ppc64le-*-ppc64le": 40,
-                "fedora-updates-server-x86_64-*-64bit": 40
+                "rocky-updates-server-ppc64le-*-ppc64le": 40,
+                "rocky-updates-server-x86_64-*-64bit": 40
             },
             "settings": {
                 "ADVISORY_BOOT_TEST": "1",
@@ -40,8 +40,8 @@
         },
         "base_selinux": {
             "profiles": {
-                "fedora-updates-server-ppc64le-*-ppc64le": 40,
-                "fedora-updates-server-x86_64-*-64bit": 40
+                "rocky-updates-server-ppc64le-*-ppc64le": 40,
+                "rocky-updates-server-x86_64-*-64bit": 40
             }
         }
     }

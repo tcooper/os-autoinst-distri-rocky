@@ -29,19 +29,19 @@
         }
     },
     "Products": {
-        "fedora-Server-dvd-iso-ppc64le-*": {
+        "rocky-dvd-iso-ppc64le-*": {
             "arch": "ppc64le",
-            "distri": "fedora",
-            "flavor": "Server-dvd-iso",
+            "distri": "rocky",
+            "flavor": "dvd-iso",
             "settings": {
                 "TEST_TARGET": "ISO"
             },
             "version": "*"
         },
-        "fedora-Server-dvd-iso-x86_64-*": {
+        "rocky-dvd-iso-x86_64-*": {
             "arch": "x86_64",
-            "distri": "fedora",
-            "flavor": "Server-dvd-iso",
+            "distri": "rocky",
+            "flavor": "dvd-iso",
             "settings": {
                 "TEST_TARGET": "ISO"
             },
@@ -49,20 +49,20 @@
         }
     },
     "Profiles": {
-        "fedora-Server-dvd-iso-ppc64le-*-ppc64le": {
+        "rocky-dvd-iso-ppc64le-*-ppc64le": {
             "machine": "ppc64le",
-            "product": "fedora-Server-dvd-iso-ppc64le-*"
+            "product": "rocky-dvd-iso-ppc64le-*"
         },
-        "fedora-Server-dvd-iso-x86_64-*-64bit": {
+        "rocky-dvd-iso-x86_64-*-64bit": {
             "machine": "64bit",
-            "product": "fedora-Server-dvd-iso-x86_64-*"
+            "product": "rocky-dvd-iso-x86_64-*"
         }
     },
     "TestSuites": {
         "base_selinux": {
             "profiles": {
-                "fedora-Server-dvd-iso-ppc64le-*-ppc64le": 40,
-                "fedora-Server-dvd-iso-x86_64-*-64bit": 40
+                "rocky-dvd-iso-ppc64le-*-ppc64le": 40,
+                "rocky-dvd-iso-x86_64-*-64bit": 40
             },
             "settings": {
                 "BOOTFROM": "c",
@@ -75,8 +75,8 @@
         },
         "install_default_upload": {
             "profiles": {
-                "fedora-Server-dvd-iso-ppc64le-*-ppc64le": 10,
-                "fedora-Server-dvd-iso-x86_64-*-64bit": 10
+                "rocky-dvd-iso-ppc64le-*-ppc64le": 10,
+                "rocky-dvd-iso-x86_64-*-64bit": 10
             },
             "settings": {
                 "PACKAGE_SET": "default",
