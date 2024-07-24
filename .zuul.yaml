@@ -1,12 +1,12 @@
 - job:
     name: os-autoinst-tox
     run: ci/tox.yaml
-    nodeset: fedora-31-vm
+    nodeset: rocky-latest-container
 
 - job:
     name: os-autoinst-perl
     run: ci/perl.yaml
-    nodeset: fedora-31-vm
+    nodeset: rocky-latest-container
 
 - project:
     check:
