@@ -108,6 +108,34 @@
         }
     },
     "Products": {
+        "rocky-GenericCloud_Base-qcow2-qcow2-aarch64-*": {
+            "arch": "aarch64",
+            "distri": "rocky",
+            "flavor": "GenericCloud_Base-qcow2-qcow2",
+            "settings": {
+                "BOOTFROM": "c",
+                "DEPLOY_UPLOAD_TEST": "",
+                "+HDD_1": "%HDD_2%",
+                "ISO": "cloudinit.iso",
+                "ROOT_PASSWORD": "weakpassword",
+                "TEST_TARGET": "HDD_1"
+            },
+            "version": "*"
+        },
+        "rocky-GenericCloud_LVM-qcow2-qcow2-aarch64-*": {
+            "arch": "aarch64",
+            "distri": "rocky",
+            "flavor": "GenericCloud_LVM-qcow2-qcow2",
+            "settings": {
+                "BOOTFROM": "c",
+                "DEPLOY_UPLOAD_TEST": "",
+                "+HDD_1": "%HDD_2%",
+                "ISO": "cloudinit.iso",
+                "ROOT_PASSWORD": "weakpassword",
+                "TEST_TARGET": "HDD_1"
+            },
+            "version": "*"
+        },
         "rocky-GenericCloud_Base-qcow2-qcow2-x86_64-*": {
             "arch": "x86_64",
             "distri": "rocky",
@@ -348,6 +376,14 @@
         }
     },
     "Profiles": {
+        "rocky-GenericCloud_Base-qcow2-qcow2-aarch64-*-aarch64": {
+            "machine": "aarch64",
+            "product": "rocky-GenericCloud_Base-qcow2-qcow2-aarch64-*"
+        },
+        "rocky-GenericCloud_LVM-qcow2-qcow2-aarch64-*-aarch64": {
+            "machine": "aarch64",
+            "product": "rocky-GenericCloud_LVM-qcow2-qcow2-aarch64-*"
+        },
         "rocky-GenericCloud_Base-qcow2-qcow2-x86_64-*-bios": {
             "machine": "bios",
             "product": "rocky-GenericCloud_Base-qcow2-qcow2-x86_64-*"
@@ -606,8 +642,10 @@
         },
         "base_service_manipulation": {
             "profiles": {
+                "rocky-GenericCloud_Base-qcow2-qcow2-aarch64-*-aarch64": 31,
                 "rocky-GenericCloud_Base-qcow2-qcow2-x86_64-*-bios": 31,
                 "rocky-GenericCloud_Base-qcow2-qcow2-x86_64-*-uefi": 30,
+                "rocky-GenericCloud_LVM-qcow2-qcow2-aarch64-*-aarch64": 31,
                 "rocky-GenericCloud_LVM-qcow2-qcow2-x86_64-*-bios": 31,
                 "rocky-GenericCloud_LVM-qcow2-qcow2-x86_64-*-uefi": 30,
                 "rocky-dvd-iso-s390x-*-s390x": 40,
