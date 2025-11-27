@@ -800,7 +800,14 @@ sub anaconda_create_user {
         @_
     );
     my $user_login = get_var("USER_LOGIN") || "test";
-    assert_and_click("anaconda_install_user_creation", timeout => $args{timeout});
+    if (get_var("LANGUAGE") eq "french") {
+        send_key "tab";
+        wait_still_screen 1;
+        send_key "ret";
+        wait_still_screen 1;
+    } else {
+        assert_and_click("anaconda_install_user_creation", timeout => $args{timeout});
+    }
     assert_screen "anaconda_install_user_creation_screen";
     # wait out animation
     wait_still_screen 2;
