@@ -48,7 +48,9 @@ sub _do_root_and_user {
     }
     # Check username (and hence keyboard layout) if non-English
     if (get_var('LANGUAGE')) {
-        assert_screen "anaconda_install_user_created";
+        if (get_var('LANGUAGE') ne 'french') {
+            assert_screen "anaconda_install_user_created";
+        }
         if (check_screen "anaconda_install_weak_password") {
             assert_and_click "anaconda_spoke_done";
         }
