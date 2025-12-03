@@ -96,6 +96,9 @@ sub run {
         wait_for_children;
     }
     else {
+        # here we're enrolling as a client
+        # install client packages
+        assert_script_run "dnf -y install ipa-client", 300;
         assert_script_run "echo '$ipa_admin_password' | realm join --user=admin ${server}", 300;
     }
     # set sssd debugging level higher (useful for debugging failures)
