@@ -57,7 +57,8 @@ sub _do_root_and_user {
         # for this test only.
         # For now blindly assume user was created successfully and move on
         # to the next step which will be `Begin Installation`.
-        if (get_var('LANGUAGE') ne 'french') {
+        my $version_major = get_version_major;
+        unless ($version_major > 9 && get_var('LANGUAGE') eq 'french') {
             assert_screen "anaconda_install_user_created";
         }
         if (check_screen "anaconda_install_weak_password") {
