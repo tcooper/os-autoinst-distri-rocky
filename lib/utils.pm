@@ -800,7 +800,17 @@ sub anaconda_create_user {
         @_
     );
     my $user_login = get_var("USER_LOGIN") || "test";
-    if (get_var("LANGUAGE") eq "french") {
+    # In Rocky 10.x with default screen resolution of 1024x768 UI element
+    # changes (content and font) in main hub shift the User Creation button
+    # off screen preventing a needle match to enter user creation screen.
+    # Changing screen resolution of this test would bring the User Creation
+    # button on screen but would force recapture of *all* needles specifically
+    # for this test only.
+    # For now blindly assume we just finished creating the root user
+    # and use send_key to move to the next UI widget on the main hub which
+    # should be the User Creation button.
+    my $version_major = get_version_major;
+    if (($version_major > 9) && (get_var("LANGUAGE") eq "french")) {
         send_key "tab";
         wait_still_screen 1;
         send_key "ret";
@@ -830,7 +840,6 @@ sub anaconda_create_user {
         _type_user_password();
     }
     # In r10+ Add adminstrative privileges to this user account (wheel group membership) is selected
-    my $version_major = get_version_major;
     if ($version_major < 10) {
         assert_and_click "anaconda_install_user_creation_make_admin";
     }
