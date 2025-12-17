@@ -8,7 +8,7 @@ use Exporter;
 use feature "switch";
 use lockapi;
 use testapi;
-our @EXPORT = qw/run_with_error_check type_safely type_very_safely desktop_vt boot_to_login_screen console_login console_switch_layout desktop_switch_layout console_loadkeys_us do_bootloader boot_decrypt check_release menu_launch_type repo_setup cleanup_workaround_repo console_initial_setup handle_welcome_screen gnome_initial_setup anaconda_create_user check_desktop download_modularity_tests quit_firefox advisory_get_installed_packages advisory_check_nonmatching_packages start_with_launcher quit_with_shortcut lo_dismiss_tip disable_firefox_studies select_rescue_mode copy_devcdrom_as_isofile get_release_number get_version_major get_code_name check_left_bar check_top_bar check_prerelease check_version spell_version_number _assert_and_click is_branched rec_log click_unwanted_notifications repos_mirrorlist register_application get_registered_applications solidify_wallpaper/;
+our @EXPORT = qw/run_with_error_check type_safely type_very_safely desktop_vt boot_to_login_screen console_login console_switch_layout desktop_switch_layout console_loadkeys_us do_bootloader boot_decrypt check_release menu_launch_type repo_setup cleanup_workaround_repo console_initial_setup handle_welcome_screen gnome_initial_setup anaconda_create_user check_desktop download_modularity_tests quit_firefox advisory_get_installed_packages advisory_check_nonmatching_packages start_with_launcher quit_with_shortcut lo_dismiss_tip disable_firefox_studies select_rescue_mode copy_devcdrom_as_isofile get_release_number get_version_major get_code_name check_left_bar check_top_bar check_prerelease check_version spell_version_number _assert_and_click is_branched rec_log click_unwanted_notifications repos_mirrorlist register_application desktop_launch_terminal get_registered_applications solidify_wallpaper/;
 
 # We introduce this global variable to hold the list of applications that have
 # registered during the apps_startstop_test when they have sucessfully run.
@@ -800,7 +800,24 @@ sub anaconda_create_user {
         @_
     );
     my $user_login = get_var("USER_LOGIN") || "test";
-    assert_and_click("anaconda_install_user_creation", timeout => $args{timeout});
+    # In Rocky 10.x with default screen resolution of 1024x768 UI element
+    # changes (content and font) in main hub shift the User Creation button
+    # off screen preventing a needle match to enter user creation screen.
+    # Changing screen resolution of this test would bring the User Creation
+    # button on screen but would force recapture of *all* needles specifically
+    # for this test only.
+    # For now blindly assume we just finished creating the root user
+    # and use send_key to move to the next UI widget on the main hub which
+    # should be the User Creation button.
+    my $version_major = get_version_major;
+    if (($version_major > 9) && (get_var("LANGUAGE") eq "french")) {
+        send_key "tab";
+        wait_still_screen 1;
+        send_key "ret";
+        wait_still_screen 1;
+    } else {
+        assert_and_click("anaconda_install_user_creation", timeout => $args{timeout});
+    }
     assert_screen "anaconda_install_user_creation_screen";
     # wait out animation
     wait_still_screen 2;
@@ -823,7 +840,6 @@ sub anaconda_create_user {
         _type_user_password();
     }
     # In r10+ Add adminstrative privileges to this user account (wheel group membership) is selected
-    my $version_major = get_version_major;
     if ($version_major < 10) {
         assert_and_click "anaconda_install_user_creation_make_admin";
     }
@@ -1227,6 +1243,8 @@ sub check_prerelease {
     my $build = get_var('BUILD');
     # if it's a nightly installer image we should see tags
     $prerelease = 1 if ($build =~ /\.t\.\d+/ && !get_var("LIVE"));
+    # In Rocky we cannot use ISO name for prerelease indication but we do usually put it in the BUILD
+    $prerelease = 1 if ($build =~ /^Rocky-\d+\.\d+-(B(?i)eta(?-i)|LookAhead)-\d+-.n.0/);
     # check based on ISO name, does not work for 8.x boot-iso name(s) which must use
     # LABEL
     my $iso = get_var('ISO');
@@ -1336,6 +1354,26 @@ sub register_application {
     my $application = shift;
     push(@application_list, $application);
     print("APPLICATION REGISTERED: $application \n");
+}
+
+# launch a terminal from a desktop, using the most efficient/reliable
+# approach (not appropriate if we really need to test launching it a
+# specific way)
+# Check, that the application has started.
+sub desktop_launch_terminal {
+    my $desktop = get_var("DESKTOP");
+    if ($desktop eq "i3") {
+        send_key "alt-ret";
+    }
+    elsif ($desktop eq "kde") {
+        send_key "ctrl-alt-t";
+    }
+    else {
+        my $string = 'terminal';
+        $string = 'ter;inql' if (get_var("LANGUAGE") eq 'french');
+        menu_launch_type($string, checkstart => 0);
+        assert_screen("apps_run_terminal");
+    }
 }
 
 # The KDE desktop tests are very difficult to maintain, because the transparency

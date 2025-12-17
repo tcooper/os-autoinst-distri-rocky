@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "height": 103,
+      "width": 168,
+      "ypos": 281,
+      "type": "match",
+      "xpos": 329
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "graphical_login_test_user_highlighted"
+  ]
+}

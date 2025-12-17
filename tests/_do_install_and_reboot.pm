@@ -48,7 +48,19 @@ sub _do_root_and_user {
     }
     # Check username (and hence keyboard layout) if non-English
     if (get_var('LANGUAGE')) {
-        assert_screen "anaconda_install_user_created";
+        # In Rocky 10.x with default screen resolution of 1024x768 UI element
+        # changes (content and font) in main hub shift the User Creation button
+        # off screen preventing a needle match to verify user was created successfully
+        # in previous call to anaconda_create_user().
+        # Changing screen resolution of this test would bring the User Creation
+        # button on screen but would force recapture of *all* needles specifically
+        # for this test only.
+        # For now blindly assume user was created successfully and move on
+        # to the next step which will be `Begin Installation`.
+        my $version_major = get_version_major;
+        unless ($version_major > 9 && get_var('LANGUAGE') eq 'french') {
+            assert_screen "anaconda_install_user_created";
+        }
         if (check_screen "anaconda_install_weak_password") {
             assert_and_click "anaconda_spoke_done";
         }
