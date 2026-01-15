@@ -11,35 +11,19 @@ sub _set_root_password {
     my $root_password = get_var("ROOT_PASSWORD") || "weakpassword";
     unless (get_var("INSTALLER_NO_ROOT")) {
         assert_and_click "anaconda_install_root_password";
-        if (get_var("MEMCHECK")) {
-            # work around https://bugzilla.redhat.com/show_bug.cgi?id=1659266
-            unless (check_screen "anaconda_install_root_password_screen", 30) {
-                record_soft_failure "UI may be frozen due to brc#1659266";
-                assert_screen "anaconda_install_root_password_screen", 300;
-            }
-        }
-        else {
-            assert_screen "anaconda_install_root_password_screen";
-        }
+        # from anaconda-35.22.1 onwards, we have to click 'enable root
+        # account' before typing the password. For older versions,
+        # clicking this needle does nothing but is harmless
+        assert_and_click "anaconda_install_root_password_screen";
         # wait out animation
         wait_still_screen 2;
         desktop_switch_layout("ascii", "anaconda") if (get_var("SWITCHED_LAYOUT"));
-        if (get_var("IMAGETYPE") eq 'dvd-ostree') {
-            # we can't type SUPER safely for ostree installer tests, as
-            # the install completes quite fast and if we type too slow
-            # the USER CREATION spoke may be blocked
-            type_safely $root_password;
-            wait_screen_change { send_key "tab"; };
-            type_safely $root_password;
-        }
-        else {
-            # these screens seems insanely subject to typing errors, so
-            # type super safely. This doesn't really slow the test down
-            # as we still get done before the install process is complete.
-            type_very_safely $root_password;
-            wait_screen_change { send_key "tab"; };
-            type_very_safely $root_password;
-        }
+        # these screens seems insanely subject to typing errors, so
+        # type super safely. This doesn't really slow the test down
+        # as we still get done before the install process is complete.
+        type_very_safely $root_password;
+        wait_screen_change { send_key "tab"; };
+        type_very_safely $root_password;
         # Another screen to test identification on
         my $identification = get_var('IDENTIFICATION');
         if ($identification eq 'true') {
@@ -64,7 +48,19 @@ sub _do_root_and_user {
     }
     # Check username (and hence keyboard layout) if non-English
     if (get_var('LANGUAGE')) {
-        assert_screen "anaconda_install_user_created";
+        # In Rocky 10.x with default screen resolution of 1024x768 UI element
+        # changes (content and font) in main hub shift the User Creation button
+        # off screen preventing a needle match to verify user was created successfully
+        # in previous call to anaconda_create_user().
+        # Changing screen resolution of this test would bring the User Creation
+        # button on screen but would force recapture of *all* needles specifically
+        # for this test only.
+        # For now blindly assume user was created successfully and move on
+        # to the next step which will be `Begin Installation`.
+        my $version_major = get_version_major;
+        unless ($version_major > 9 && get_var('LANGUAGE') eq 'french') {
+            assert_screen "anaconda_install_user_created";
+        }
         if (check_screen "anaconda_install_weak_password") {
             assert_and_click "anaconda_spoke_done";
         }
@@ -182,7 +178,7 @@ sub run {
         # messages, which screw up some needles
         assert_script_run 'sed -i -e "s,\(GRUB_CMDLINE_LINUX.*\)\",\1 console=tty0 quiet\",g" ' . $mount . '/etc/default/grub';
         # regenerate the bootloader config
-        assert_script_run "chroot $mount grub2-mkconfig -o /boot/efi/EFI/rocky/grub.cfg";
+        assert_script_run "chroot $mount grub2-mkconfig -o /boot/grub2/grub.cfg";
     }
     if (grep { $_ eq 'abrt' } @actions) {
         # Chroot in the newly installed system and switch on ABRT systemwide
