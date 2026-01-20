@@ -714,17 +714,6 @@
                 "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%"
             }
         },
-        "desktop_fprint": {
-            "profiles": {
-                "rocky-dvd-iso-x86_64-*-uefi": 30
-            },
-            "settings": {
-                "BOOTFROM": "c",
-                "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
-                "POSTINSTALL": "desktop_fprint",
-                "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%"
-            }
-        },
         "desktop_keyring": {
             "profiles": {
                 "rocky-dvd-iso-x86_64-*-uefi": 30
@@ -745,14 +734,6 @@
                 "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
                 "POSTINSTALL": "desktop_login",
                 "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%"
-            }
-        },
-        "desktop_notifications_live": {
-            "profiles": {
-                "rocky-dvd-iso-x86_64-*-uefi": 30
-            },
-            "settings": {
-                "ENTRYPOINT": "desktop_notifications"
             }
         },
         "desktop_notifications_postinstall": {
