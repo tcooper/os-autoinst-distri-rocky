@@ -698,6 +698,7 @@
             },
             "settings": {
                 "BOOTFROM": "c",
+                "DESKTOP": "gnome",
                 "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
                 "POSTINSTALL": "desktop_background",
                 "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%"
@@ -709,6 +710,7 @@
             },
             "settings": {
                 "BOOTFROM": "c",
+                "DESKTOP": "gnome",
                 "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
                 "POSTINSTALL": "desktop_browser",
                 "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%"
@@ -720,6 +722,7 @@
             },
             "settings": {
                 "BOOTFROM": "c",
+                "DESKTOP": "gnome",
                 "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
                 "POSTINSTALL_PATH": "tests/applications/keyring",
                 "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%"
@@ -731,6 +734,7 @@
             },
             "settings": {
                 "BOOTFROM": "c",
+                "DESKTOP": "gnome",
                 "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
                 "POSTINSTALL": "desktop_login",
                 "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%"
@@ -742,6 +746,7 @@
             },
             "settings": {
                 "BOOTFROM": "c",
+                "DESKTOP": "gnome",
                 "ENTRYPOINT": "desktop_notifications",
                 "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
                 "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%"
@@ -753,6 +758,7 @@
             },
             "settings": {
                 "BOOTFROM": "c",
+                "DESKTOP": "gnome",
                 "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
                 "USE_CUPS": "1",
                 "POSTINSTALL": "desktop_printing",
@@ -765,6 +771,7 @@
             },
             "settings": {
                 "BOOTFROM": "c",
+                "DESKTOP": "gnome",
                 "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
                 "POSTINSTALL": "desktop_printing",
                 "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%"
@@ -776,6 +783,7 @@
             },
             "settings": {
                 "BOOTFROM": "c",
+                "DESKTOP": "gnome",
                 "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
                 "POSTINSTALL": "desktop_terminal",
                 "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%"
