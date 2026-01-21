@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "xpos": 951,
+      "type": "match",
+      "ypos": 699,
+      "height": 19,
+      "width": 27
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "locked_screen_switch_user"
+  ]
+}
