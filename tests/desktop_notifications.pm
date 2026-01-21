@@ -59,7 +59,9 @@ sub run {
         }
     }
     # can't use assert_script_run here as long as we're on tty1
-    type_string "systemctl isolate graphical.target\n";
+    # we don't use isolate per:
+    # https://github.com/systemd/systemd/issues/26364#issuecomment-1424900066
+    type_string "systemctl start graphical.target\n";
     # we trust systemd to switch us to the right tty here
     if (get_var("BOOTFROM")) {
         assert_screen 'graphical_login';
@@ -67,12 +69,17 @@ sub run {
         # GDM 3.24.1 dumps a cursor in the middle of the screen here...
         mouse_hide;
         if (get_var("DESKTOP") eq 'gnome') {
+            if (get_version_major() > 8) {
+                send_key_until_needlematch("graphical_login_test_user_highlighted", "tab", 3, 5);
+                assert_screen "graphical_login_test_user_highlighted";
+            }
             # we have to hit enter to get the password dialog, and it
             # doesn't always work for some reason so just try it three
             # times
             send_key_until_needlematch("graphical_login_input", "ret", 3, 5);
         }
         assert_screen "graphical_login_input";
+        wait_still_screen 5;
         type_very_safely get_var("USER_PASSWORD", "weakpassword");
         send_key 'ret';
     }
