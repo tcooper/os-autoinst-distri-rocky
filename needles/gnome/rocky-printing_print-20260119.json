@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "xpos": 804,
+      "width": 40,
+      "ypos": 124,
+      "type": "match",
+      "height": 19
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "printing_print"
+  ]
+}

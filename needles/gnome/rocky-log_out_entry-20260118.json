@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "xpos": 758,
+      "type": "match",
+      "ypos": 405,
+      "height": 20,
+      "width": 55
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "log_out_entry"
+  ]
+}

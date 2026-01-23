@@ -872,7 +872,15 @@ sub check_desktop {
     # GNOME 40 starts on the overview by default; for consistency with
     # older GNOME and KDE, let's just close it
     if (match_has_tag "apps_menu_button_active") {
-        send_key "alt-f1";
+        # Rocky 9 and 10 with GNOME 40 and 47 start on the overview by default;
+        # check_desktop tries to detect this and deactivate with alt-f1 but this
+        # isn't working in 10.
+        if (get_var("DISTRI") eq "rocky" && (get_version_major() >= 9)) {
+            send_key "esc";
+        }
+        else {
+            send_key "alt-f1";
+        }
         assert_screen "apps_menu_button_inactive";
     }
 }

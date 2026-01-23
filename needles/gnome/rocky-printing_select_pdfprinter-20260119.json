@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "xpos": 209,
+      "width": 99,
+      "type": "match",
+      "height": 19,
+      "ypos": 282
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "printing_select_pdfprinter"
+  ]
+}
