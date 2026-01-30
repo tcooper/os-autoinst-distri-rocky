@@ -5,7 +5,7 @@
             "settings": {
                 "ARCH_BASE_MACHINE": "64bit",
                 "PART_TABLE_TYPE": "mbr",
-                "QEMUCPU": "Nehalem",
+                "QEMUCPU": "Haswell",
                 "QEMUCPUS": "2",
                 "QEMURAM": "2048",
                 "QEMU_VIDEO_DEVICE": "virtio-vga",
@@ -71,7 +71,7 @@
             "settings": {
                 "ARCH_BASE_MACHINE": "64bit",
                 "PART_TABLE_TYPE": "gpt",
-                "QEMUCPU": "Nehalem",
+                "QEMUCPU": "Haswell",
                 "QEMUCPUS": "2",
                 "QEMURAM": "2048",
                 "QEMU_VIDEO_DEVICE": "virtio-vga",
@@ -89,7 +89,7 @@
             "settings": {
                 "ARCH_BASE_MACHINE": "64bit",
                 "PART_TABLE_TYPE": "gpt",
-                "QEMUCPU": "Nehalem",
+                "QEMUCPU": "Haswell",
                 "QEMUCPUS": "2",
                 "QEMURAM": "3072",
                 "QEMU_VIDEO_DEVICE": "virtio-vga",
@@ -108,6 +108,34 @@
         }
     },
     "Products": {
+        "rocky-GenericCloud_Base-qcow2-qcow2-aarch64-*": {
+            "arch": "aarch64",
+            "distri": "rocky",
+            "flavor": "GenericCloud_Base-qcow2-qcow2",
+            "settings": {
+                "BOOTFROM": "c",
+                "DEPLOY_UPLOAD_TEST": "",
+                "+HDD_1": "%HDD_2%",
+                "ISO": "cloudinit.iso",
+                "ROOT_PASSWORD": "weakpassword",
+                "TEST_TARGET": "HDD_1"
+            },
+            "version": "*"
+        },
+        "rocky-GenericCloud_LVM-qcow2-qcow2-aarch64-*": {
+            "arch": "aarch64",
+            "distri": "rocky",
+            "flavor": "GenericCloud_LVM-qcow2-qcow2",
+            "settings": {
+                "BOOTFROM": "c",
+                "DEPLOY_UPLOAD_TEST": "",
+                "+HDD_1": "%HDD_2%",
+                "ISO": "cloudinit.iso",
+                "ROOT_PASSWORD": "weakpassword",
+                "TEST_TARGET": "HDD_1"
+            },
+            "version": "*"
+        },
         "rocky-GenericCloud_Base-qcow2-qcow2-x86_64-*": {
             "arch": "x86_64",
             "distri": "rocky",
@@ -141,7 +169,6 @@
             "distri": "rocky",
             "flavor": "boot-iso",
             "settings": {
-                "GRUB": "ip=dhcp",
                 "HDDSIZEGB": "15",
                 "TEST_TARGET": "ISO"
             },
@@ -152,7 +179,6 @@
             "distri": "rocky",
             "flavor": "boot-iso",
             "settings": {
-                "GRUB": "ip=dhcp",
                 "HDDSIZEGB": "15",
                 "TEST_TARGET": "ISO"
             },
@@ -163,7 +189,6 @@
             "distri": "rocky",
             "flavor": "boot-iso",
             "settings": {
-                "GRUB": "ip=dhcp",
                 "HDDSIZEGB": "15",
                 "TEST_TARGET": "ISO"
             },
@@ -174,7 +199,6 @@
             "distri": "rocky",
             "flavor": "boot-iso",
             "settings": {
-                "GRUB": "ip=dhcp",
                 "+QEMURAM": 3072,
                 "HDDSIZEGB": "15",
                 "TEST_TARGET": "ISO"
@@ -352,6 +376,14 @@
         }
     },
     "Profiles": {
+        "rocky-GenericCloud_Base-qcow2-qcow2-aarch64-*-aarch64": {
+            "machine": "aarch64",
+            "product": "rocky-GenericCloud_Base-qcow2-qcow2-aarch64-*"
+        },
+        "rocky-GenericCloud_LVM-qcow2-qcow2-aarch64-*-aarch64": {
+            "machine": "aarch64",
+            "product": "rocky-GenericCloud_LVM-qcow2-qcow2-aarch64-*"
+        },
         "rocky-GenericCloud_Base-qcow2-qcow2-x86_64-*-bios": {
             "machine": "bios",
             "product": "rocky-GenericCloud_Base-qcow2-qcow2-x86_64-*"
@@ -621,8 +653,10 @@
         },
         "base_service_manipulation": {
             "profiles": {
+                "rocky-GenericCloud_Base-qcow2-qcow2-aarch64-*-aarch64": 31,
                 "rocky-GenericCloud_Base-qcow2-qcow2-x86_64-*-bios": 31,
                 "rocky-GenericCloud_Base-qcow2-qcow2-x86_64-*-uefi": 30,
+                "rocky-GenericCloud_LVM-qcow2-qcow2-aarch64-*-aarch64": 31,
                 "rocky-GenericCloud_LVM-qcow2-qcow2-x86_64-*-bios": 31,
                 "rocky-GenericCloud_LVM-qcow2-qcow2-x86_64-*-uefi": 30,
                 "rocky-dvd-iso-s390x-*-s390x": 40,
@@ -864,6 +898,103 @@
                 "BOOTFROM": "c",
                 "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
                 "POSTINSTALL_PATH": "tests/applications/weather",
+                "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%"
+            }
+        },
+        "desktop_background": {
+            "profiles": {
+                "rocky-dvd-iso-x86_64-*-uefi": 30
+            },
+            "settings": {
+                "BOOTFROM": "c",
+                "DESKTOP": "gnome",
+                "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
+                "POSTINSTALL": "desktop_background",
+                "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%"
+            }
+        },
+        "desktop_browser": {
+            "profiles": {
+                "rocky-dvd-iso-x86_64-*-uefi": 30
+            },
+            "settings": {
+                "BOOTFROM": "c",
+                "DESKTOP": "gnome",
+                "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
+                "POSTINSTALL": "desktop_browser",
+                "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%"
+            }
+        },
+        "desktop_keyring": {
+            "profiles": {
+                "rocky-dvd-iso-x86_64-*-uefi": 30
+            },
+            "settings": {
+                "BOOTFROM": "c",
+                "DESKTOP": "gnome",
+                "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
+                "POSTINSTALL_PATH": "tests/applications/keyring",
+                "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%"
+            }
+        },
+        "desktop_login": {
+            "profiles": {
+                "rocky-dvd-iso-x86_64-*-uefi": 30
+            },
+            "settings": {
+                "BOOTFROM": "c",
+                "DESKTOP": "gnome",
+                "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
+                "POSTINSTALL": "desktop_login",
+                "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%"
+            }
+        },
+        "desktop_notifications_postinstall": {
+            "profiles": {
+                "rocky-dvd-iso-x86_64-*-uefi": 30
+            },
+            "settings": {
+                "BOOTFROM": "c",
+                "DESKTOP": "gnome",
+                "ENTRYPOINT": "desktop_notifications",
+                "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
+                "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%"
+            }
+        },
+        "desktop_printing": {
+            "profiles": {
+                "rocky-dvd-iso-x86_64-*-uefi": 30
+            },
+            "settings": {
+                "BOOTFROM": "c",
+                "DESKTOP": "gnome",
+                "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
+                "USE_CUPS": "1",
+                "POSTINSTALL": "desktop_printing",
+                "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%"
+            }
+        },
+        "desktop_printing_builtin": {
+            "profiles": {
+                "rocky-dvd-iso-x86_64-*-uefi": 30
+            },
+            "settings": {
+                "BOOTFROM": "c",
+                "DESKTOP": "gnome",
+                "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
+                "POSTINSTALL": "desktop_printing",
+                "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%"
+            }
+        },
+        "desktop_terminal": {
+            "profiles": {
+                "rocky-dvd-iso-x86_64-*-uefi": 30
+            },
+            "settings": {
+                "BOOTFROM": "c",
+                "DESKTOP": "gnome",
+                "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
+                "POSTINSTALL": "desktop_terminal",
                 "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%"
             }
         },
@@ -1307,15 +1438,14 @@
         "install_pxeboot": {
             "profiles": {
                 "rocky-universal-aarch64-*-aarch64": 30,
-                "rocky-universal-x86_64-*-uefi": 30,
-                "rocky-universal-x86_64-*-bios": 31
+                "rocky-universal-x86_64-*-uefi": 30
             },
             "settings": {
                 "+ISO": "",
                 "DELAYED_START": "1",
                 "KICKSTART": "1",
                 "NICTYPE": "tap",
-                "PARALLEL_WITH": "support_server@bios",
+                "PARALLEL_WITH": "support_server",
                 "PXEBOOT": "once",
                 "ROOT_PASSWORD": "111111",
                 "TEST_TARGET": "COMPOSE",

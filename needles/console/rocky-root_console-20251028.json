@@ -1,0 +1,24 @@
+{
+  "area": [
+    {
+      "width": 39,
+      "xpos": 1,
+      "type": "match",
+      "ypos": 144,
+      "height": 16
+    },
+    {
+      "xpos": 146,
+      "ypos": 145,
+      "width": 22,
+      "height": 13,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "root_console",
+    "root_logged_in"
+  ]
+}

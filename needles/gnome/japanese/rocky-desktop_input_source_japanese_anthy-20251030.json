@@ -1,0 +1,17 @@
+{
+  "area": [
+    {
+      "height": 21,
+      "ypos": 320,
+      "width": 97,
+      "xpos": 336,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "LANGUAGE-japanese",
+    "desktop_input_source_japanese_anthy"
+  ]
+}
