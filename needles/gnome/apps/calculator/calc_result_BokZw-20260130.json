@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "height": 39,
+      "type": "match",
+      "ypos": 294,
+      "width": 51,
+      "xpos": 163
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "calc_result_BokZw"
+  ]
+}
