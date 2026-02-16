@@ -39,8 +39,16 @@ sub run {
 
     # Download the test data
     download_testdata();
+
+    # Install Evince with flatpak
+    assert_script_run("flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo");
+    assert_script_run "flatpak install -y flathub org.gnome.Evince", 300;
+
     # Exit the terminal
     desktop_vt;
+
+    # Set the update notification timestamp
+    set_update_notification_timestamp();
 
     # Start the application
     menu_launch_type("evince", checkstart => 1);
@@ -49,7 +57,7 @@ sub run {
     # Click on Open button to open the File Open Dialog
     assert_and_click("evince_open_file_dialog", button => "left", timeout => 30);
 
-    if (get_var("CANNED")) {
+    if (get_var("CANNED") || (get_var("DISTRI") eq "rocky" && (get_version_major() < 10))) {
         # open the Documents folder.
         assert_and_click("evince_documents", button => "left", timeout => 30);
     }

@@ -10,14 +10,44 @@ use utils;
 sub run {
     my $self = shift;
 
+    # Switch to console
+    $self->root_console(tty => 3);
+
     # Install clocks with flatpak
     # NOTE: This will trigger an authentication (perhaps 2x) in desktop_vt()
-    $self->root_console(tty => 3);
     assert_script_run("flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo");
-    assert_script_run "flatpak install -y flathub org.gnome.clocks",300;
+    assert_script_run "flatpak install -y flathub org.gnome.clocks", 300;
 
-    # At first, we need to set time and time zones manually.
-    $self->root_console(tty => 3);
+    # In Rocky 9 there may be an issue starting Clocks that appears to be resolved in Rocky 10
+    # This is a workaround to update the Gnome environment (see below) that requires logout/login
+    # to be effective.
+    # https://discussion.fedoraproject.org/t/gnome-flatpaks-apps-are-crashing-or-not-opening/133653/26
+    if (get_var("DISTRI") eq "rocky" && (get_version_major() < 10))
+    {
+        my $password = get_var("USER_PASSWORD", "weakpassword");
+        assert_script_run('echo "GSK_RENDERER=ngl" >> /etc/environment');
+
+        # Return back
+        desktop_vt();
+
+        # Logout/login to use updated environment
+        assert_and_click "system_menu_button";
+        assert_and_click "leave_button";
+        assert_and_click "log_out_entry";
+        assert_and_click "log_out_confirm";
+        wait_still_screen 5;
+        mouse_hide;
+        send_key "tab";
+        send_key_until_needlematch("graphical_login_input", "ret", 3, 5);
+        assert_screen "graphical_login_input";
+        type_very_safely $password;
+        send_key "ret";
+        wait_still_screen 3;
+
+        # Switch to the console
+        $self->root_console(tty => 3);
+    }
+
     # Switch off automatic time.
     assert_script_run("timedatectl set-ntp 0");
 
