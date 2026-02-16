@@ -101,7 +101,7 @@ sub run {
     # just for convenience - sometimes it's useful to see this log
     # for a success case
     upload_logs "/tmp/packaging.log", failok => 1;
-    send_key "ctrl-alt-f6";
+    select_console "tty6-console";
 
     # Anaconda hub
     assert_screen "anaconda_main_hub", 30;    #

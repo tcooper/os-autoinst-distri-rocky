@@ -10,7 +10,9 @@ use utils;
 sub run {
     my $self = shift;
 
-    console_login();
+    # Install clocks with flatpak
+    # NOTE: This will trigger an authentication (perhaps 2x) in desktop_vt()
+    $self->root_console(tty => 3);
     assert_script_run("flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo");
     assert_script_run "flatpak install -y flathub org.gnome.clocks",300;
 
@@ -18,10 +20,13 @@ sub run {
     $self->root_console(tty => 3);
     # Switch off automatic time.
     assert_script_run("timedatectl set-ntp 0");
+
     # Set the time zone
     assert_script_run("timedatectl set-timezone Europe/Prague");
+
     # Set the time and date
     assert_script_run("timedatectl set-time '2024-09-09 09:00:00'");
+
     # Return back
     desktop_vt();
 
@@ -29,7 +34,10 @@ sub run {
     set_update_notification_timestamp();
 
     # Start the Application
+    # We need to do extra checking, therefore we want to start simple
+    # and not use the menu_launch_type, so we do the checks manually.
     menu_launch_type("clocks");
+
     assert_screen ["apps_run_clocks", "grant_access"];
     # give access rights if asked
     if (match_has_tag 'grant_access') {

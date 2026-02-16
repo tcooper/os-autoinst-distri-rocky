@@ -7,7 +7,8 @@ sub run {
     my $self = shift;
     my $user = get_var("USER_LOGIN", "test");
 
-    console_login();
+    # Switch to console
+    $self->root_console(tty => 3);
 
     assert_script_run("flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo");
     assert_script_run('flatpak install -y net.sourceforge.ExtremeTuxRacer', timeout => 300);

@@ -30,19 +30,20 @@ sub download_testdata {
 
 sub run {
     my $self = shift;
+
     # Switch to console
     $self->root_console(tty => 3);
+
     # Perform git test
     check_and_install_git();
+
     # Download the test data
     download_testdata();
     # Exit the terminal
     desktop_vt;
 
     # Start the application
-    menu_launch_type("evince");
-    # Check that is started
-    assert_screen 'apps_run_dviewer';
+    menu_launch_type("evince", checkstart => 1);
 
     # Open the test file to create a starting point for the other Evince tests.
     # Click on Open button to open the File Open Dialog
