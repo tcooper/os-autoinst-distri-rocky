@@ -5,8 +5,8 @@ use utils;
 
 sub run {
     my $self = shift;
-    my $ipa_domain = 'test.openqa.rockylinux.org';
-    my $ipa_realm = 'TEST.OPENQA.ROCKYLINUX.ORG';
+    my $ipa_domain = get_var("REALMD_DOMAIN", "test.openqa.rockylinux.org");
+    my $ipa_realm = get_var("REALMD_REALM", "TEST.OPENQA.ROCKYLINUX.ORG");
 
     # Rocky SUT is graphical so stay on/force tty3 do NOT switch to tty1
     $self->root_console(tty => 3);
