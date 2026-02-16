@@ -1,0 +1,17 @@
+{
+  "area": [
+    {
+      "xpos": 725,
+      "width": 91,
+      "type": "match",
+      "ypos": 486,
+      "height": 19
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "LANGUAGE-russian",
+    "anaconda_rawhide_accept_fate"
+  ]
+}

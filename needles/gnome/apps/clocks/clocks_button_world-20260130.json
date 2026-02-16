@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "xpos": 288,
+      "width": 77,
+      "type": "match",
+      "height": 28,
+      "ypos": 40
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "clocks_button_world"
+  ]
+}

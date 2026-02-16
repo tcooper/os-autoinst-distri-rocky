@@ -9,6 +9,10 @@ sub run {
     my $version_major = get_version_major;
     my $desktop = get_var("DESKTOP");
     check_desktop;
+    # See utils.pm/check_desktop() for justification
+    if (get_var("DISTRI") eq "rocky" && (get_version_major() >= 10)) {
+        assert_and_click "apps_menu_button";
+    }
     menu_launch_type('terminal');
     assert_screen "apps_run_terminal";
     # FIXME: workaround for RHBZ#1957858 - test actually works without

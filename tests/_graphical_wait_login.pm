@@ -114,9 +114,11 @@ sub run {
             handle_welcome_screen unless (get_var("_WELCOME_DONE"));
         }
     }
-    if (get_version_major() > 8) {
-        handle_welcome_screen unless (get_var("_WELCOME_DONE"));
-    }
+    # FIXME: Figure out why this was added. seems to be handled above. inclusion
+    # causes soft-fail.
+    #if (get_version_major() > 8) {
+    #    handle_welcome_screen unless (get_var("_WELCOME_DONE"));
+    #}
     if (get_var("DESKTOP") eq 'gnome' && get_var("INSTALL_NO_USER")) {
         # handle welcome screen if we didn't do it above (holy flow
         # control, Batman!)

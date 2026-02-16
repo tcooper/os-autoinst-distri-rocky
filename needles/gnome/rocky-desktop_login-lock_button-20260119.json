@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "xpos": 921,
+      "ypos": 56,
+      "width": 20,
+      "height": 45,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "lock_button"
+  ]
+}

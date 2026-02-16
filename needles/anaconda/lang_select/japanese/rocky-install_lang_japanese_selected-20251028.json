@@ -1,0 +1,17 @@
+{
+  "area": [
+    {
+      "xpos": 607,
+      "width": 93,
+      "ypos": 217,
+      "type": "match",
+      "height": 16
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "LANGUAGE-japanese",
+    "anaconda_select_install_lang_selected"
+  ]
+}
