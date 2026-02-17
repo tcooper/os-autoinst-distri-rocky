@@ -10,7 +10,7 @@
   ],
   "properties": [],
   "tags": [
-    " ENV-DISTRI-rocky",
+    "ENV-DISTRI-rocky",
     "disks_select_partition_two"
   ]
 }

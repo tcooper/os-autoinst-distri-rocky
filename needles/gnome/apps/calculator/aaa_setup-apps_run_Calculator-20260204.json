@@ -10,6 +10,7 @@
   ],
   "properties": [],
   "tags": [
+    "ENV-DISTRI-rocky",
     "apps_run_Calculator"
   ]
 }
