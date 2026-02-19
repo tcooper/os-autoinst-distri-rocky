@@ -102,7 +102,8 @@ sub desktop_vt {
     while ($xout =~ /tty(\d)/g) {
         $tty = $1;    # most recent match is probably best
     }
-    send_key "ctrl-alt-f${tty}";
+    select_console "tty${tty}-console";
+
     # work around https://gitlab.gnome.org/GNOME/gnome-software/issues/582
     # if it happens. As of 2019-05, seeing something similar on KDE too
     my $desktop = get_var('DESKTOP');
@@ -119,11 +120,13 @@ sub desktop_vt {
         }
     }
     else {
-        type_very_safely "\t";
-        type_very_safely "\n";
-        type_very_safely "weakpassword\n";
-        wait_still_screen 3;
-        send_key 'alt-f1';
+        if (get_var("DISTRI") ne "rocky") {
+            type_very_safely "\t";
+            type_very_safely "\n";
+            type_very_safely "weakpassword\n";
+            wait_still_screen 3;
+            send_key 'alt-f1';
+        }
     }
 }
 
@@ -1162,8 +1165,13 @@ sub menu_launch_type {
     # launcher, typing the specified string and hitting enter. Pass
     # the string to be typed to launch whatever it is you want.
     my $app = shift;
-    # super does not work on KDE, because fml
-    send_key 'alt-f1';
+    if (get_var("DISTRI") eq "rocky" && (get_version_major() >= 9)) {
+        send_key 'super';
+    }
+    else {
+        # super does not work on KDE, because fml
+        send_key 'alt-f1';
+    }
     # srsly KDE y u so slo
     wait_still_screen 3;
     type_very_safely $app;
