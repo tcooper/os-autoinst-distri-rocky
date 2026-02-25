@@ -1687,65 +1687,6 @@
                 "WORKER_CLASS": "tap"
             }
         },
-        "install_vnc_client": {
-            "profiles": {
-                "rocky-dvd-iso-aarch64-*-aarch64": 40,
-                "rocky-dvd-iso-x86_64-*-uefi": 40
-            },
-            "settings": {
-                "BOOTFROM": "c",
-                "DESKTOP": "gnome",
-                "HDD_1": "disk_rocky%CURRREL%_desktop_%ARCH%.qcow2",
-                "INSTALL": "1",
-                "NICTYPE": "tap",
-                "PARALLEL_WITH": "install_vnc_server",
-                "PREINSTALL": "_vnc_client_connect_pre _graphical_wait_login _vnc_client_connect",
-                "VNC_CLIENT": "1",
-                "WORKER_CLASS": "tap"
-            }
-        },
-        "install_vnc_server": {
-            "profiles": {
-                "rocky-dvd-iso-aarch64-*-aarch64": 40,
-                "rocky-dvd-iso-x86_64-*-uefi": 40
-            },
-            "settings": {
-                "GRUB": "inst.vnc net.ifnames=0 biosdevname=0 ip=172.16.2.114::172.16.2.2:255.255.255.0:vnc001.test.openqa.rockylinux.org:eth0:off",
-                "NICTYPE": "tap",
-                "VNC_SERVER": "1",
-                "WORKER_CLASS": "tap"
-            }
-        },
-        "install_vncconnect_client": {
-            "profiles": {
-                "rocky-dvd-iso-aarch64-*-aarch64": 40,
-                "rocky-dvd-iso-x86_64-*-uefi": 40
-            },
-            "settings": {
-                "BOOTFROM": "c",
-                "DESKTOP": "gnome",
-                "HDD_1": "disk_rocky%CURRREL%_desktop_%ARCH%.qcow2",
-                "INSTALL": "1",
-                "NICTYPE": "tap",
-                "PREINSTALL": "_vncconnect_client_setup_pre _graphical_wait_login _vncconnect_client_setup",
-                "VNC_CLIENT": "1",
-                "WORKER_CLASS": "tap"
-            }
-        },
-        "install_vncconnect_server": {
-            "profiles": {
-                "rocky-dvd-iso-aarch64-*-aarch64": 40,
-                "rocky-dvd-iso-x86_64-*-uefi": 40
-            },
-            "settings": {
-                "GRUB": "inst.vnc inst.vncconnect=172.16.2.117:5500 net.ifnames=0 biosdevname=0 ip=172.16.2.116::172.16.2.2:255.255.255.0:vnc003.test.openqa.rockylinux.org:eth0:off",
-                "INSTALL_UNLOCK": "vncconnect_client_ready",
-                "NICTYPE": "tap",
-                "PARALLEL_WITH": "install_vncconnect_client",
-                "VNC_SERVER": "1",
-                "WORKER_CLASS": "tap"
-            }
-        },
         "install_xfs": {
             "profiles": {
                 "rocky-universal-s390x-*-s390x": 40,
