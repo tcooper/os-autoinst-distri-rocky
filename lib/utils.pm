@@ -758,12 +758,9 @@ sub gnome_initial_setup {
             }
         }
     }
-    unless (get_var("VNC_CLIENT")) {
-        # click 'Skip' one time (this is the 'goa' screen). We don't
-        # get it on VNC_CLIENT case as network isn't working (yet)
-        mouse_set(100, 100);
-        wait_screen_change { assert_and_click "skip_button"; };
-    }
+    # click 'Skip' one time (this is the 'goa' screen)
+    mouse_set(100, 100);
+    wait_screen_change { assert_and_click "skip_button"; };
     send_key "ret";
     if ($args{prelogin}) {
         # create user
