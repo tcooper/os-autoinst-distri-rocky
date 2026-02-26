@@ -1702,17 +1702,6 @@
                 "DESKTOP": "false"
             }
         },
-        "memtest": {
-            "profiles": {
-                "rocky-universal-s390x-*-s390x": 30,
-                "rocky-universal-ppc64le-*-ppc64le": 30,
-                "rocky-universal-aarch64-*-aarch64": 30,
-                "rocky-universal-x86_64-*-bios": 30
-            },
-            "settings": {
-                "ENTRYPOINT": "memtest"
-            }
-        },
         "modularity_tests": {
             "profiles": {
                 "rocky-dvd-iso-s390x-*-s390x": 30,
