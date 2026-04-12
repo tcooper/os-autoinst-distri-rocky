@@ -1,0 +1,18 @@
+{
+  "area": [
+    {
+      "height": 32,
+      "width": 664,
+      "type": "match",
+      "ypos": 59,
+      "xpos": 253,
+      "match": 90
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "LANGUAGE-arabic",
+    "topbar_generic"
+  ]
+}
