@@ -1,0 +1,18 @@
+{
+  "area": [
+    {
+      "ypos": 7,
+      "type": "match",
+      "width": 35,
+      "height": 18,
+      "xpos": 977
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "DESKTOP-gnome",
+    "ENV-DISTRI-rocky",
+    "apps_menu_button",
+    "apps_menu_button_inactive"
+  ]
+}
