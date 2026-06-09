@@ -1328,6 +1328,7 @@
                 "PACKAGE_SET": "minimal",
                 "PARTITIONING": "custom_lvm_ext4",
                 "ROOT_PASSWORD": "weakpassword",
+                "HDDSIZEGB": "17",
                 "STORE_HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2"
             }
         },

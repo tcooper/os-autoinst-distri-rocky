@@ -235,8 +235,9 @@ sub run {
 
         # put the updates image in the NFS repo (for testing this update
         # image delivery method)
-        # TODO: Replace with Rocky equivalent or remove completely.
-        # assert_script_run "curl -o /repo/images/updates.img https://fedorapeople.org/groups/qa/updates/updates-openqa.img";
+        # TODO: Create our own patch for anaconda to remove upstream dependency. NOTE: updates.img modified Anaconda
+        #       disk_partitioning screens and is also used in tests that have TEST_UPDATES=1 defined in templates.fif.json.
+        assert_script_run "curl -o /repo/images/updates.img https://fedorapeople.org/groups/qa/updates/updates-openqa.img";
 
         # create the iso share
         assert_script_run "mkdir -p /iso";
