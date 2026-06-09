@@ -4,6 +4,24 @@ use testapi;
 use anaconda;
 use utils;
 
+sub _enter_password {
+    my $password = shift;
+    if (get_var("SWITCHED_LAYOUT")) {
+        # see _do_install_and_reboot; when layout is switched
+        # see _do_root_and_user; when layout is switched
+        # user password is doubled to contain both US and native
+        # chars
+        desktop_switch_layout 'ascii';
+        type_very_safely $password;
+        desktop_switch_layout 'native';
+        type_very_safely $password;
+    }
+    else {
+        type_very_safely $password;
+    }
+    send_key "ret";
+}
+
 sub run {
     my $self = shift;
     my $password = get_var("USER_PASSWORD", "weakpassword");
@@ -79,19 +97,7 @@ sub run {
         # seems like we often double-type on aarch64 if we start right
         # away
         wait_still_screen 5;
-        if (get_var("SWITCHED_LAYOUT")) {
-            # see _do_install_and_reboot; when layout is switched
-            # user password is doubled to contain both US and native
-            # chars
-            desktop_switch_layout 'ascii';
-            type_very_safely $password;
-            desktop_switch_layout 'native';
-            type_very_safely $password;
-        }
-        else {
-            type_very_safely $password;
-        }
-        send_key "ret";
+        _enter_password($password);
     }
 
     # Welcome tour is here...

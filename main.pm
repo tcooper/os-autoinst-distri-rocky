@@ -215,9 +215,10 @@ sub load_install_tests() {
         autotest::loadtest "tests/_anaconda_kdump_disable.pm";
     }
 
-    # Start installation, set user & root passwords, reboot
-    # install and reboot phase is loaded automatically every time (except when KICKSTART is set)
-    autotest::loadtest "tests/_do_install_and_reboot.pm";
+    # Set user & root passwords, start installation, reboot
+    # these are loaded automatically every time (except when (PARTIAL_)KICKSTART is set)
+    autotest::loadtest 'tests/_do_root_and_user.pm' unless (get_var('PARTIAL_KICKSTART'));
+    autotest::loadtest 'tests/_do_install_and_reboot.pm';
 }
 
 sub _load_instance {
