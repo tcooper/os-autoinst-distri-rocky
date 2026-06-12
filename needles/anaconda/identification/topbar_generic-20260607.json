@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "height": 47,
+      "width": 270,
+      "ypos": 45,
+      "type": "match",
+      "xpos": 239
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "topbar_generic"
+  ]
+}

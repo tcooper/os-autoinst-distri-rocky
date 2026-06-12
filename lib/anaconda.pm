@@ -9,7 +9,7 @@ use testapi;
 use utils;
 use bugzilla;
 
-our @EXPORT = qw/select_disks custom_scheme_select custom_add_partition custom_blivet_add_partition custom_blivet_format_partition custom_blivet_resize_partition custom_change_type custom_change_fs custom_change_device custom_delete_part get_full_repo check_help_on_pane get_mirrorlist_url crash_anaconda_text report_bug_text/;
+our @EXPORT = qw/select_disks custom_scheme_select custom_add_partition custom_blivet_add_partition custom_blivet_format_partition custom_blivet_resize_partition custom_change_type custom_change_fs custom_change_device custom_delete_part anaconda_create_user get_full_repo check_help_on_pane get_mirrorlist_url crash_anaconda_text report_bug_text/;
 
 sub select_disks {
     # Handles disk selection. Has one optional argument - number of
@@ -358,6 +358,89 @@ sub custom_delete_part {
     return if not $part;
     assert_and_click "anaconda_part_select_$part";
     assert_and_click "anaconda_part_delete";
+}
+
+sub _type_user_password {
+    # convenience function used by anaconda_create_user, not meant
+    # for direct use
+    my $user_password = get_var("USER_PASSWORD") || "weakpassword";
+    if (get_var("SWITCHED_LAYOUT") && !(get_var("LIVE") && get_var("DESKTOP") eq "kde")) {
+        # we double the password, the second time using the native
+        # layout, so the password has both ASCII and native characters
+        # FIXME can't do this on KDE live ATM as switching does not
+        # work in the live environment
+        my $environment = 'anaconda';
+        $environment = get_var('DESKTOP') if (get_var('LIVE'));
+        desktop_switch_layout "ascii", $environment;
+        type_very_safely $user_password;
+        desktop_switch_layout "native", $environment;
+        assert_screen "${environment}_layout_native";
+        type_very_safely $user_password;
+        desktop_switch_layout "ascii", $environment;
+    }
+    else {
+        type_very_safely $user_password;
+    }
+}
+
+sub anaconda_create_user {
+    # Create a user, in the anaconda interface. This is here because
+    # the same code works both during install and for initial-setup,
+    # which runs post-install, so we can share it.
+    my %args = (
+        timeout => 90,
+        @_
+    );
+    # For some languages, i.e. Turkish, we want to use a complicated
+    # geo field to test that turkish letters will be displayed correctly
+    # and that the installer will be able to handle them and change them
+    # into the correct user name without special characters.
+    my $geofield = get_var("USER_GECOS");
+    my $user_login = get_var("USER_LOGIN") || "test";
+    unless ($geofield) {
+        # If geofield is not defined, let it be the same as login.
+        $geofield = $user_login;
+    }
+    assert_and_click("anaconda_install_user_creation", timeout => $args{timeout});
+    assert_screen "anaconda_install_user_creation_screen";
+    # wait out animation
+    wait_still_screen 2;
+    # We will type the $geofield as the user name.
+    type_very_safely $geofield;
+    # For Turkish, we especially want to check that correct characters
+    # are typed, so we will check it here.
+    if (get_var("LANGUAGE") eq "turkish") {
+        assert_screen("username_typed_correctly_turkish");
+    }
+    send_key("tab");
+    # Now set the login name.
+    type_very_safely($user_login);
+    # And fill the password stuff.
+    type_very_safely "\t\t\t";
+    _type_user_password();
+    wait_screen_change { send_key "tab"; };
+    wait_still_screen 2;
+    _type_user_password();
+    # even with all our slow typing this still *sometimes* seems to
+    # miss a character, so let's try again if we have a warning bar.
+    # But not if we're installing with a switched layout, as those
+    # will *always* result in a warning bar at this point (see below)
+    if (!get_var("SWITCHED_LAYOUT") && check_screen "anaconda_warning_bar", 3) {
+        wait_screen_change { send_key "shift-tab"; };
+        wait_still_screen 2;
+        _type_user_password();
+        wait_screen_change { send_key "tab"; };
+        wait_still_screen 2;
+        _type_user_password();
+    }
+    assert_and_click "anaconda_spoke_done";
+    # since 20170105, we will get a warning here when the password
+    # contains non-ASCII characters. Assume only switched layouts
+    # produce non-ASCII characters, though this isn't strictly true
+    if (get_var('SWITCHED_LAYOUT') && check_screen "anaconda_warning_bar", 3) {
+        wait_still_screen 1;
+        assert_and_click "anaconda_spoke_done";
+    }
 }
 
 sub get_full_repo {

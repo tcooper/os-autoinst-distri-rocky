@@ -1,0 +1,18 @@
+{
+  "area": [
+    {
+      "xpos": 367,
+      "width": 29,
+      "height": 19,
+      "ypos": 56,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "DESKTOP-gnome",
+    "ENV-DISTRI-rocky",
+    "LANGUAGE-japanese",
+    "desktop_yama_hiragana"
+  ]
+}

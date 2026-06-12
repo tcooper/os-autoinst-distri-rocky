@@ -1,89 +1,27 @@
 use base "anacondatest";
 use strict;
 use testapi;
+use anaconda;
 use utils;
-
-
-sub _set_root_password {
-    # Set root password, unless we don't want to or can't
-    # can also hit a transition animation
-    wait_still_screen 2;
-    my $root_password = get_var("ROOT_PASSWORD") || "weakpassword";
-    unless (get_var("INSTALLER_NO_ROOT")) {
-        assert_and_click "anaconda_install_root_password";
-        # from anaconda-35.22.1 onwards, we have to click 'enable root
-        # account' before typing the password. For older versions,
-        # clicking this needle does nothing but is harmless
-        assert_and_click "anaconda_install_root_password_screen";
-        # wait out animation
-        wait_still_screen 2;
-        desktop_switch_layout("ascii", "anaconda") if (get_var("SWITCHED_LAYOUT"));
-        # these screens seems insanely subject to typing errors, so
-        # type super safely. This doesn't really slow the test down
-        # as we still get done before the install process is complete.
-        type_very_safely $root_password;
-        wait_screen_change { send_key "tab"; };
-        type_very_safely $root_password;
-        # Another screen to test identification on
-        my $identification = get_var('IDENTIFICATION');
-        if ($identification eq 'true') {
-            check_top_bar();
-            # we don't check version or pre-release because here those
-            # texts appear on the banner which makes the needling
-            # complex and fragile (banner is different between variants,
-            # and has a gradient so for RTL languages the background color
-            # differs; pre-release text is also translated)
-        }
-        assert_and_click "anaconda_spoke_done";
-    }
-}
-
-sub _do_root_and_user {
-    _set_root_password();
-    # Set user details, unless the test is configured not to create one
-    unless (get_var("USER_LOGIN") eq 'false' || get_var("INSTALL_NO_USER")) {
-        # Wait out animation
-        wait_still_screen 8;
-        anaconda_create_user();
-    }
-    # Check username (and hence keyboard layout) if non-English
-    if (get_var('LANGUAGE')) {
-        # In Rocky 10.x with default screen resolution of 1024x768 UI element
-        # changes (content and font) in main hub shift the User Creation button
-        # off screen preventing a needle match to verify user was created successfully
-        # in previous call to anaconda_create_user().
-        # Changing screen resolution of this test would bring the User Creation
-        # button on screen but would force recapture of *all* needles specifically
-        # for this test only.
-        # For now blindly assume user was created successfully and move on
-        # to the next step which will be `Begin Installation`.
-        my $version_major = get_version_major;
-        unless ($version_major > 9 && get_var('LANGUAGE') eq 'french') {
-            assert_screen "anaconda_install_user_created";
-        }
-        if (check_screen "anaconda_install_weak_password") {
-            assert_and_click "anaconda_spoke_done";
-        }
-    }
-}
 
 sub run {
     my $self = shift;
-    # From F31 onwards (after Fedora-Rawhide-20190722.n.1), user and
-    # root password spokes are moved to main hub, so we must do those
-    # before we run the install.
-    my $rootuserdone = 0;
-    assert_screen ["anaconda_main_hub_begin_installation", "anaconda_install_root_password"], 300;
-    if (match_has_tag "anaconda_install_root_password") {
-        _do_root_and_user();
-        $rootuserdone = 1;
-    }
+    my $webui = get_var("_ANACONDA_WEBUI");
+    my $desktop = get_var("DESKTOP");
+
     # Begin installation
     # Sometimes, the 'slide in from the top' animation messes with
     # this - by the time we click the button isn't where it was any
-    # more. So wait for screen to stop moving before we click.
-    wait_still_screen 8;
-    assert_and_click "anaconda_main_hub_begin_installation";
+    # more. So we'll retry a few times until the button goes away
+    assert_screen ["anaconda_main_hub_begin_installation", "anaconda_webui_begin_installation"], 90;
+    wait_still_screen 3;
+    my $tries = 5;
+    while ($tries) {
+        $tries--;
+        click_lastmatch;
+        wait_still_screen 2;
+        last unless (check_screen ["anaconda_main_hub_begin_installation", "anaconda_webui_begin_installation"]);
+    }
 
     # If we want to test identification we will do it
     # on several places in this procedure, such as
@@ -91,20 +29,10 @@ sub run {
     # etc.
     my $identification = get_var('IDENTIFICATION');
     my $branched = get_var('VERSION');
-    if ($identification eq 'true' or $branched ne "Rawhide") {
-        check_left_bar();
+    if ($identification eq 'true' or ($branched ne "Rawhide" && lc($branched) ne "eln")) {
+        check_left_bar() unless ($webui);
         check_prerelease();
         check_version();
-    }
-
-    unless ($rootuserdone) {
-        _do_root_and_user();
-        # With the slow typing - especially with SWITCHED_LAYOUT - we
-        # may not complete user creation until anaconda reaches post-install,
-        # which causes a 'Finish configuration' button
-        if (check_screen "anaconda_install_finish_configuration", 5) {
-            assert_and_click "anaconda_install_finish_configuration";
-        }
     }
 
     # Wait for install to end. Give Rawhide a bit longer, in case
@@ -114,34 +42,53 @@ sub run {
     if ($version eq "rawhide" || lc(get_var('DISTRI')) eq "rocky") {
         $timeout = 4800;
     }
+
     # workstation especially has an unfortunate habit of kicking in
     # the screensaver during install...
     my $interval = 60;
     while ($timeout > 0) {
+        die "Error encountered!" if (check_screen "anaconda_error_report");
         # move the mouse a bit
         mouse_set 100, 100;
+        # also click, if we're a RDP client, seems just moving mouse
+        # isn't enough to defeat blanking
+        mouse_click if (get_var("RDP_CLIENT"));
         mouse_hide;
         last if (check_screen "anaconda_install_done", $interval);
         $timeout -= $interval;
     }
     assert_screen "anaconda_install_done";
+
     # wait for transition to complete so we don't click in the sidebar
     wait_still_screen 3;
+
     # if this is a live install, let's go ahead and quit the installer
     # in all cases, just to make sure quitting doesn't crash etc.
-    assert_and_click "anaconda_install_done" if (get_var('LIVE'));
+    if (get_var('LIVE')) {
+        # not on Workstation with webUI, as it immediately reboots
+        assert_and_click "anaconda_install_done" unless ($webui && $desktop eq "gnome");
+    }
+
     # there are various things we might have to do at a console here
     # before we actually reboot. let's figure them all out first...
     my @actions;
     push(@actions, 'consoletty0') if (get_var("ARCH") eq "aarch64");
     push(@actions, 'abrt') if (get_var("ABRT", '') eq "system");
     push(@actions, 'rootpw') if (get_var("INSTALLER_NO_ROOT"));
+    push(@actions, 'usbhalt') if (get_var("USBBOOT"));
     push(@actions, 'stagingrepos') if (get_var("DNF_CONTENTDIR"));
     push(@actions, 'releasever') if (get_var("DNF_RELEASEVER"));
+
     # memcheck test doesn't need to reboot at all. Rebooting from GUI
     # for lives is unreliable. And if we're already doing something
     # else at a console, we may as well reboot from there too
     push(@actions, 'reboot') if (!get_var("MEMCHECK") && (get_var("LIVE") || @actions));
+
+    # our approach for taking all these actions doesn't work on RDP
+    # installs, fortunately we don't need any of them in that case
+    # yet, so for now let's just flush the list here if we're RDP
+    @actions = () if (get_var("RDP_CLIENT"));
+
     # If we have no actions, let's just go ahead and reboot now,
     # unless this is memcheck
     unless (@actions) {
@@ -150,9 +97,14 @@ sub run {
         }
         return undef;
     }
+
     # OK, if we're here, we got actions, so head to a console. Switch
     # to console after liveinst sometimes takes a while, so 30 secs
     $self->root_console(timeout => 30);
+    if (get_var("LIVE") && (get_var("LAYOUT") eq "french" || get_var("LANGUAGE") eq "japanese")) {
+        console_loadkeys_us;
+    }
+
     # this is something a couple of actions may need to know
     my $mount = "/mnt/sysimage";
     if (get_var("CANNED")) {
@@ -179,8 +131,22 @@ sub run {
     }
     if (grep { $_ eq 'rootpw' } @actions) {
         my $root_password = get_var("ROOT_PASSWORD") || "weakpassword";
-        assert_script_run "echo 'root:$root_password' | chpasswd -R $mount";
+        # this seems to have started to fail periodically with "failure while
+        # writing changes to /etc/shadow" on 2023-09-01, attempt to work
+        # around that
+        my $count = 5;
+        while ($count) {
+            last unless (script_run "echo 'root:$root_password' | chpasswd -R $mount");
+            die "setting root password failed five time!" unless ($count);
+            $count -= 1;
+        }
+        # fix SELinux context on /etc/shadow to avoid denials later
+        script_run "chroot $mount restorecon -v /etc/shadow";
     }
+    if (grep { $_ eq 'noplymouth' } @actions) {
+        assert_script_run "chroot $mount dnf -y remove plymouth";
+    }
+
     if (grep { $_ eq 'stagingrepos' } @actions) {
         if (get_version_major() < 9) {
             assert_script_run 'sed -i -e "s/^mirrorlist/#mirrorlist/g;s,^#\(baseurl=http[s]*://\),\1,g" ' . $mount . '/etc/yum.repos.d/Rocky-BaseOS.repo';
@@ -197,6 +163,17 @@ sub run {
     }
     if (grep { $_ eq 'releasever' } @actions) {
         assert_script_run 'printf "%s\n" "' . get_var("DNF_RELEASEVER") . '" > ' . $mount . '/etc/dnf/vars/releasever';
+    }
+
+    if (grep { $_ eq 'usbhalt' } @actions) {
+        # halt the system cleanly to ensure install is complete
+        type_string "systemctl halt\n";
+        wait_still_screen 5;
+        # disconnect the USB stick
+        disconnect_usb;
+        # reboot via ACPI
+        power "reset";
+        return;
     }
     type_string "reboot\n" if (grep { $_ eq 'reboot' } @actions);
 }
