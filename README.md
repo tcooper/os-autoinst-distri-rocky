@@ -1,10 +1,10 @@
 # openQA tests for the Rocky Linux distribution
 
-This repository contains tests and images for testing [Rocky](https://rockylinux.org/download) with [openQA](http://os-autoinst.github.io/openQA/). The [fedora_openqa library and CLI](https://pagure.io/fedora-qa/fedora_openqa) are used for scheduling tests, and [createhdds](https://pagure.io/fedora-qa/createhdds) is used for creating base disk images for the test. For openQA installation instructions, see [the Fedora openQA wiki page](https://fedoraproject.org/wiki/OpenQA).
+This repository contains tests and images for testing [Rocky](https://rockylinux.org/download) with [openQA](http://os-autoinst.github.io/openQA/). Tests are scheduled using [scripts](https://github.com/rocky-linux/os-autoinst-distri-rocky/tree/develop/scripts), and [createhdds](https://github.com/rocky-linux/createhdds) is used for creating base disk images for the test. For openQA installation instructions, see [the Rocky Linux openQA Installation Guide](https://github.com/rocky-linux/OpenQA-Fedora-Installation).
 
 ## Issues
 
-[Issues](https://pagure.io/fedora-qa/os-autoinst-distri-fedora/issues) and [pull requests](https://pagure.io/fedora-qa/os-autoinst-distri-fedora/pull-requests) are tracked in [os-autoinst-distri-fedora Pagure](https://pagure.io/fedora-qa/os-autoinst-distri-fedora). Pagure uses a Github-like pull request workflow, so if you're familiar with that, you can easily submit Pagure pull requests. If not, you can read up in the [Pagure documentation](https://docs.pagure.org/pagure/usage/index.html).
+[Issues](https://github.com/rocky-linux/os-autoinst-distri-rocky/issues) and [pull requests](https://github.com/rocky-linux/os-autoinst-distri-rocky/pulls) are tracked in [os-autoinst-distri-rocky Github](https://github.com/rocky-linux/os-autoinst-distri-rocky/).
 
 ## Requirements
 
@@ -81,13 +81,13 @@ There are also several modules that export utility functions, currently `utils`,
 and `test_flags()` method, inheriting from one of the classes mentioned above.
 2. Set correct variables (so that all test parts you have made are executed) in [WebUI -> Test suites](https://localhost:8080/admin/test_suites).
 3. Link your newly created Test suite to medium type in [WebUI -> Job groups](https://localhost:8080/admin/groups).
-4. Run test (see [fedora_openqa repository](https://pagure.io/fedora-qa/fedora_openqa)).
+4. Run test (see [fedora_openqa repository](https://forge.fedoraproject.org/quality/fedora_openqa)).
 5. Create needles (images) by using interactive mode and needles editor in WebUI.
 6. Add new test suite and profiles into `templates.fif.json` file (and/or `templates-updates.fif.json`, if the test is applicable to the update testing workflow)
-7. Add new Test suite and Test case into [`conf_test_suites.py`](https://pagure.io/fedora-qa/fedora_openqa/blob/master/f/src/fedora_openqa/conf_test_suites.py) file in fedora_openqa repository.
+7. Add new Test suite and Test case into [`conf_test_suites.py`](https://forge.fedoraproject.org/quality/fedora_openqa/blob/master/f/src/fedora_openqa/conf_test_suites.py) file in fedora_openqa repository.
 8. Run `tox`. This will check the templates are valid.
-9. Open pull request for the os-autoinst-distri-fedora changes in [Pagure](https://pagure.io/fedora-qa/os-autoinst-distri-fedora). Pagure uses a Github-style workflow (summary: fork the project via the web interface, push your changes to a branch on your fork, then use the web interface to submit a pull request). See the [Pagure documentation](https://docs.pagure.org/pagure/usage/index.html) for more details.
-10. Open a pull request in [fedora_openqa Pagure](https://pagure.io/fedora-qa/fedora_openqa) for any necessary fedora_openqa changes.
+9. Open pull request for the os-autoinst-distri-fedora changes in [Pagure](https://forge.fedoraproject.org/quality/os-autoinst-distri-fedora). Pagure uses a Github-style workflow (summary: fork the project via the web interface, push your changes to a branch on your fork, then use the web interface to submit a pull request). See the [Pagure documentation](https://docs.pagure.org/pagure/usage/index.html) for more details.
+10. Open a pull request in [fedora_openqa Pagure](https://forge.fedoraproject.org/quality/fedora_openqa) for any necessary fedora_openqa changes.
 
 ### Language handling
 
@@ -112,4 +112,4 @@ Use the following guidelines to understand the level of approval needed to merge
 
 The contents of this repository are available under the GPL, version 3 or any later version. A copy is included as COPYING. Note that we do not include the full GPL header in every single test file as they are quite short and this would waste a lot of space.
 
-The tools and tests in this repository are maintained by the [Rocky Linux QA team](https://wiki.rockylinux.org/team/testing). We are grateful to the [openSUSE](https://opensuse.org) team for developing openQA, to the [Fedora QA team](https://fedoraproject.org/wiki/QA) for their respin and for the [openSUSE tests](https://github.com/os-autoinst/os-autoinst-distri-opensuse) and [Fedora tests](https://pagure.io/fedora-qa/os-autoinst-distri-fedora) on which this repository was initially based (and from which occasional pieces are still borrowed).
+The tools and tests in this repository are maintained by the [Rocky Linux QA team](https://wiki.rockylinux.org/team/testing). We are grateful to the [openSUSE](https://opensuse.org) team for developing openQA, to the [Fedora QA team](https://fedoraproject.org/wiki/QA) for their respin and for the [openSUSE tests](https://github.com/os-autoinst/os-autoinst-distri-opensuse) and [Fedora tests](https://forge.fedoraproject.org/quality/os-autoinst-distri-fedora) on which this repository was initially based (and from which occasional pieces are still borrowed).

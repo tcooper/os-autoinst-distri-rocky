@@ -21,7 +21,7 @@ sub download_testdata {
     # Navigate to the test's home directory
     assert_script_run("cd /home/test/");
     # Clone the test repository
-    assert_script_run("git clone https://pagure.io/fedora-qa/openqa_testdata.git");
+    assert_script_run("git clone https://forge.fedoraproject.org/quality/openqa-testdata.git");
     # Change ownership and attributes
     assert_script_run("chown -R test:test openqa_testdata");
     # Move the test file into a correct location.

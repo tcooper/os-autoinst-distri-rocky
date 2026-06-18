@@ -36,7 +36,7 @@ sub run {
     # upload the config so we can check it's OK
     upload_logs "/etc/mock/openqa.cfg";
     # now check out the kickstarts
-    assert_script_run 'git clone https://pagure.io/fedora-kickstarts.git';
+    assert_script_run 'git clone https://forge.fedoraproject.org/releng/spin-kickstarts';
     assert_script_run 'cd fedora-kickstarts';
     assert_script_run "git checkout f${version}";
     # now add the side repo to fedora-repo-not-rawhide.ks
