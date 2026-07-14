@@ -1,0 +1,17 @@
+{
+  "area": [
+    {
+      "type": "match",
+      "width": 40,
+      "height": 24,
+      "ypos": 43,
+      "xpos": 565
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "cheating",
+    "weather_report_daily"
+  ]
+}
