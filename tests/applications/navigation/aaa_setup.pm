@@ -61,7 +61,13 @@ sub run {
         type_very_safely $password;
         send_key "ret";
         wait_still_screen 3;
+
+        # Switch to the console
+        $self->root_console(tty => 3);
     }
+
+    # Return back
+    desktop_vt();
 
     # Set the update notification timestamp
     set_update_notification_timestamp();
