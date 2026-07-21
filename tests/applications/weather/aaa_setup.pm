@@ -15,11 +15,11 @@ sub run {
     assert_script_run("flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo");
     assert_script_run "flatpak install -y flathub org.gnome.Weather", 300;
 
-    # In Rocky 9 and 10 there may be an issue starting Gnome flatpak applications.
+    # In Rocky 9 there may be an issue starting Gnome flatpak applications.
     # This is a workaround to update the Gnome environment (see below) that requires logout/login
     # to be effective.
     # https://discussion.fedoraproject.org/t/gnome-flatpaks-apps-are-crashing-or-not-opening/133653/26
-    if (get_var("DISTRI") eq "rocky")
+    if (get_var("DISTRI") eq "rocky" && (get_version_major() < 10))
     {
         my $password = get_var("USER_PASSWORD", "weakpassword");
         assert_script_run('echo "GSK_RENDERER=ngl" >> /etc/environment');
@@ -68,21 +68,34 @@ sub run {
     # Set the update notification timestamp
     set_update_notification_timestamp();
 
-    # Start the Application
-    # We need to do extra checking, therefore we want to start simple
-    # and not use the menu_launch_type, so we do the checks manually.
-    menu_launch_type("weather");
+    if (get_var("DISTRI") eq "rocky" && (get_version_major() < 10))
+    {
+        # Start the Application
+        # We need to do extra checking, therefore we want to start simple
+        # and not use the menu_launch_type, so we do the checks manually.
+        menu_launch_type("weather");
 
-    assert_screen ["apps_run_weather", "grant_access"];
-    # sometimes we match apps_run_weather for a split second before
-    # grant_access appears, so handle that
-    wait_still_screen 3;
-    assert_screen ['apps_run_weather', 'grant_access'];
+        assert_screen ["apps_run_weather", "grant_access"];
+        # sometimes we match apps_run_weather for a split second before
+        # grant_access appears, so handle that
+        wait_still_screen 3;
+        assert_screen ['apps_run_weather', 'grant_access'];
 
-    # give access rights if asked
-    if (match_has_tag 'grant_access') {
-        click_lastmatch;
-        assert_screen 'apps_run_weather';
+        # give access rights if asked
+        if (match_has_tag 'grant_access') {
+            click_lastmatch;
+            assert_screen 'apps_run_weather';
+        }
+    }
+
+    # Workaround issue in Rocky 10 where Weather cannot be started
+    # with the launcher but can be started with the flatpak cli command
+    if (get_var("DISTRI") eq "rocky" && (get_version_major() > 9))
+    {
+        # Run a command using the command dialogue
+        send_key('alt-f2');
+        wait_still_screen(2);
+        type_very_safely("flatpak run org.gnome.Weather\n");
     }
 
     # Make it fill the entire window.
