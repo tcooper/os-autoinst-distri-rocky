@@ -8,7 +8,7 @@ use Exporter;
 use feature "switch";
 use lockapi;
 use testapi;
-our @EXPORT = qw/run_with_error_check type_safely type_very_safely desktop_vt boot_to_login_screen console_login console_switch_layout desktop_switch_layout console_loadkeys_us do_bootloader boot_decrypt check_release menu_launch_type repo_setup cleanup_workaround_repo console_initial_setup handle_welcome_screen gnome_initial_setup anaconda_create_user check_desktop download_modularity_tests quit_firefox advisory_get_installed_packages advisory_check_nonmatching_packages start_with_launcher quit_with_shortcut lo_dismiss_tip disable_firefox_studies select_rescue_mode copy_devcdrom_as_isofile get_release_number get_version_major get_code_name check_left_bar check_top_bar check_prerelease check_version spell_version_number _assert_and_click is_branched rec_log click_unwanted_notifications repos_mirrorlist register_application desktop_launch_terminal get_registered_applications solidify_wallpaper check_and_install_git download_testdata make_serial_writable set_update_notification_timestamp kde_doublek_workaround dm_perform_login/;
+our @EXPORT = qw/run_with_error_check type_safely type_very_safely desktop_vt boot_to_login_screen console_login console_switch_layout desktop_switch_layout console_loadkeys_us do_bootloader boot_decrypt check_release menu_launch_type repo_setup cleanup_workaround_repo console_initial_setup handle_welcome_screen gnome_initial_setup anaconda_create_user check_desktop quit_firefox advisory_get_installed_packages advisory_check_nonmatching_packages start_with_launcher quit_with_shortcut lo_dismiss_tip disable_firefox_studies select_rescue_mode copy_devcdrom_as_isofile get_release_number get_version_major get_code_name check_left_bar check_top_bar check_prerelease check_version spell_version_number _assert_and_click is_branched rec_log click_unwanted_notifications repos_mirrorlist register_application desktop_launch_terminal get_registered_applications solidify_wallpaper check_and_install_git download_testdata make_serial_writable set_update_notification_timestamp kde_doublek_workaround dm_perform_login/;
 
 # We introduce this global variable to hold the list of applications that have
 # registered during the apps_startstop_test when they have sucessfully run.
@@ -493,16 +493,11 @@ sub _repo_setup_compose {
     my $location = get_var("LOCATION");
     return unless $location;
     assert_script_run 'dnf config-manager --set-disabled updates-testing updates';
-    # script_run returns the exit code, so 'unless' here means 'if the file exists'
-    unless (script_run 'test -f /etc/yum.repos.d/fedora-updates-modular.repo') {
-        assert_script_run 'dnf config-manager --set-disabled updates-testing-modular updates-modular';
-    }
-    # we use script_run here as the rawhide and modular repo files
+    # we use script_run here as the rawhide repo files
     # won't always exist and we don't want to bother testing or
     # predicting their existence; assert_script_run doesn't buy you
     # much with sed as it'll return 0 even if it replaced nothing
     script_run "sed -i -e 's,^metalink,#metalink,g' -e 's,^mirrorlist,#mirrorlist,g' -e 's,^#baseurl.*basearch,baseurl=${location}/Everything/\$basearch,g' -e 's,^#baseurl.*source,baseurl=${location}/Everything/source,g' /etc/yum.repos.d/{fedora,fedora-rawhide}.repo", 0;
-    script_run "sed -i -e 's,^metalink,#metalink,g' -e 's,^mirrorlist,#mirrorlist,g' -e 's,^#baseurl.*basearch,baseurl=${location}/Modular/\$basearch,g' -e 's,^#baseurl.*source,baseurl=${location}/Modular/source,g' /etc/yum.repos.d/{fedora-modular,fedora-rawhide-modular}.repo", 0;
 
     # this can be used for debugging if something is going wrong
     #    unless (script_run 'pushd /etc/yum.repos.d && tar czvf yumreposd.tar.gz * && popd') {
@@ -530,10 +525,6 @@ sub _repo_setup_updates {
         # release at this point, but it won't *hurt* anything, so no
         # need to except that case really
         assert_script_run "dnf config-manager --set-disabled updates-testing";
-        # same for Modular, if appropriate
-        unless (script_run 'test -f /etc/yum.repos.d/fedora-updates-modular.repo') {
-            assert_script_run "dnf config-manager --set-disabled updates-testing-modular";
-        }
     }
 
     # Set up an additional repo containing the update or task packages. We do
@@ -904,19 +895,6 @@ sub check_desktop {
         }
         assert_screen "apps_menu_button_inactive";
     }
-}
-
-sub download_modularity_tests {
-    # Download the modularity test script, place in the system and then
-    # modify the access rights to make it executable.
-    my ($whitelist) = @_;
-    # we need python3-yaml for the script to run
-    assert_script_run 'dnf -y install python3-yaml', 180;
-    assert_script_run 'curl -o /root/test.py https://pagure.io/fedora-qa/modularity_testing_scripts/raw/master/f/modular_functions.py';
-    if ($whitelist eq 'whitelist') {
-        assert_script_run 'curl -o /root/whitelist https://pagure.io/fedora-qa/modularity_testing_scripts/raw/master/f/whitelist';
-    }
-    assert_script_run 'chmod 755 /root/test.py';
 }
 
 sub quit_firefox {
