@@ -25,8 +25,13 @@ sub run {
     # still be visible.
     send_key("f11");
 
-    # We still need to see the prompt.
-    assert_screen("terminal_prompt");
+    # We still need to see the prompt. However in a virtual machine,
+    # it sometimes takes some time before the prompt appears. Let's
+    # wait for it some more time. Also try to move the mouse
+    # and click in the middle to unblock the top panel.
+    mouse_set(500, 350);
+    mouse_click("left");
+    assert_screen("terminal_prompt", timeout => 60);
     # But we should not see the panels.
     if (check_screen("panel_controls")) {
         die("It seems that full screen mode has not been triggered correctly.");
@@ -46,6 +51,3 @@ sub test_flags {
 1;
 
 # vim: set sw=4 et:
-
-
-

@@ -1,0 +1,18 @@
+{
+  "area": [
+    {
+      "height": 79,
+      "type": "match",
+      "width": 96,
+      "xpos": 263,
+      "ypos": 51
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "DESKTOP-gnome",
+    "ENV-DISTRI-rocky",
+    "desktop_update_notification",
+    "desktop_update_notification_only"
+  ]
+}
