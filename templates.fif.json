@@ -1703,23 +1703,6 @@
                 "DESKTOP": "false"
             }
         },
-        "modularity_tests": {
-            "profiles": {
-                "rocky-dvd-iso-s390x-*-s390x": 30,
-                "rocky-dvd-iso-ppc64le-*-ppc64le": 30,
-                "rocky-dvd-iso-aarch64-*-aarch64": 30,
-                "rocky-dvd-iso-x86_64-*-uefi": 30
-            },
-            "settings": {
-                "BOOTFROM": "c",
-                "DESKTOP": "gnome",
-                "HDD_1": "disk_%FLAVOR%_%MACHINE%.qcow2",
-                "POSTINSTALL": "modularity_module_list modularity_enable_disable_module modularity_install_module",
-                "ROOT_PASSWORD": "weakpassword",
-                "START_AFTER_TEST": "%DEPLOY_UPLOAD_TEST%",
-                "USER_LOGIN": "false"
-            }
-        },
         "podman": {
             "profiles": {
                 "rocky-dvd-iso-x86_64-*-uefi": 30

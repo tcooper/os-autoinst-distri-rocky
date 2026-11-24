@@ -15,6 +15,7 @@ sub run {
     my $desktop = get_var("DESKTOP");
     my $relnum = get_release_number;
     my $version_major = get_version_major;
+
     # for the live image case, handle bootloader here
     if (get_var("BOOTFROM")) {
         do_bootloader(postinstall => 1, params => '3');
@@ -23,10 +24,26 @@ sub run {
         do_bootloader(postinstall => 0, params => '3');
     }
     boot_to_login_screen;
+
     # use tty1 to avoid RHBZ #1821499 on F32 Workstation live
     $self->root_console(tty => 1);
+
+    # In Rocky we don't install_default with updated ISO
+    if (get_var('DISTRI') eq 'rocky') {
+        # completing a full dnf update without test-packages first will
+        # allow capture of updates available (without critical) screen
+        if (get_var('DNF_UPDATE')) {
+            script_run 'dnf -y update --skip-broken --nobest', 360;
+            script_run 'dnf --clean-all';
+        }
+
+        # test package is in devel repo
+        script_run 'dnf -y config-manager --set-enabled devel', 0;
+    }
+
     # ensure we actually have some package updates available
     prepare_test_packages;
+
     if ($desktop eq 'gnome') {
         # On GNOME, move the clock forward if needed, because it won't
         # check for updates before 6am(!)
@@ -37,6 +54,7 @@ sub run {
             script_run 'systemctl mask chronyd.service ntpd.service';
             assert_script_run 'date --set="06:00:00"';
         }
+
         if (get_var("BOOTFROM")) {
             # Set a bunch of update checking-related timestamps to
             # two days ago or two weeks ago to try and make sure we
@@ -50,7 +68,6 @@ sub run {
             console_login(user => get_var('USER_LOGIN', 'test'), password => get_var('USER_PASSWORD', 'weakpassword'));
             script_run "gsettings set org.gnome.software check-timestamp ${yyday}", 0;
             script_run "gsettings set org.gnome.software update-notification-timestamp ${longago}", 0;
-            script_run "gsettings set org.gnome.software online-updates-timestamp ${longago}", 0;
             script_run "gsettings set org.gnome.software upgrade-notification-timestamp ${longago}", 0;
             script_run "gsettings set org.gnome.software install-timestamp ${longago}", 0;
             wait_still_screen 5;
@@ -58,10 +75,12 @@ sub run {
             console_login(user => 'root', password => get_var('ROOT_PASSWORD', 'weakpassword'));
         }
     }
+
     # can't use assert_script_run here as long as we're on tty1
     # we don't use isolate per:
     # https://github.com/systemd/systemd/issues/26364#issuecomment-1424900066
     type_string "systemctl start graphical.target\n";
+
     # we trust systemd to switch us to the right tty here
     if (get_var("BOOTFROM")) {
         assert_screen 'graphical_login';
@@ -84,6 +103,7 @@ sub run {
         send_key 'ret';
     }
     check_desktop(timeout => 90);
+
     # now, WE WAIT. Because KDE on F34+ shows a notification only
     # briefly we will keep an eye out and record if we saw it (logic
     # around this comes later). But we wait the whole ten minutes even

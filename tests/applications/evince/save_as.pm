@@ -18,13 +18,8 @@ sub run {
     # Ensure we're in Documents directory and Select filename to edit
     assert_and_click("evince_documents");
 
-    # Rocky 9 save-as dialog is different than Rocky 10
-    if (get_var("DISTRI") eq "rocky" && (get_version_major() < 10)) {
-        assert_and_dclick("evince_select_file");
-    }
-    else {
-        assert_and_click("evince_select_file");
-    }
+    # Select filename
+    assert_and_dclick("evince_select_file");
 
     # Type a new name.
     type_very_safely("alternative");

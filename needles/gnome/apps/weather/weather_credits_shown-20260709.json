@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "ypos": 171,
+      "xpos": 339,
+      "type": "match",
+      "width": 160,
+      "height": 80
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "weather_credits_shown"
+  ]
+}
