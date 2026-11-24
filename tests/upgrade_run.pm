@@ -17,9 +17,6 @@ sub run {
     cleanup_workaround_repo;
     repo_setup();
     my $params = "-y --releasever=${relnum}";
-    if ($release eq "rawhide") {
-        $params .= " --nogpgcheck";
-    }
 
     # FIXME workaround for #1811234 affecting F30 -> F31 upgrades
     # remove when bug is fixed or F30 goes EOL

@@ -8,7 +8,7 @@ use Exporter;
 use feature "switch";
 use lockapi;
 use testapi;
-our @EXPORT = qw/run_with_error_check type_safely type_very_safely desktop_vt boot_to_login_screen console_login console_switch_layout desktop_switch_layout console_loadkeys_us do_bootloader boot_decrypt check_release menu_launch_type repo_setup cleanup_workaround_repo console_initial_setup handle_welcome_screen gnome_initial_setup anaconda_create_user check_desktop download_modularity_tests quit_firefox advisory_get_installed_packages advisory_check_nonmatching_packages start_with_launcher quit_with_shortcut lo_dismiss_tip disable_firefox_studies select_rescue_mode copy_devcdrom_as_isofile get_release_number get_version_major get_code_name check_left_bar check_top_bar check_prerelease check_version spell_version_number _assert_and_click is_branched rec_log click_unwanted_notifications repos_mirrorlist register_application get_registered_applications solidify_wallpaper/;
+our @EXPORT = qw/run_with_error_check type_safely type_very_safely desktop_vt boot_to_login_screen console_login console_switch_layout desktop_switch_layout console_loadkeys_us do_bootloader boot_decrypt check_release menu_launch_type repo_setup cleanup_workaround_repo console_initial_setup handle_welcome_screen gnome_initial_setup anaconda_create_user check_desktop quit_firefox advisory_get_installed_packages advisory_check_nonmatching_packages start_with_launcher quit_with_shortcut lo_dismiss_tip disable_firefox_studies select_rescue_mode copy_devcdrom_as_isofile get_release_number get_version_major get_code_name check_left_bar check_top_bar check_prerelease check_version spell_version_number _assert_and_click is_branched rec_log click_unwanted_notifications repos_mirrorlist register_application desktop_launch_terminal get_registered_applications solidify_wallpaper check_and_install_git download_testdata make_serial_writable set_update_notification_timestamp kde_doublek_workaround dm_perform_login/;
 
 # We introduce this global variable to hold the list of applications that have
 # registered during the apps_startstop_test when they have sucessfully run.
@@ -76,7 +76,7 @@ sub get_code_name {
 
     given ($version_major) {
         when ('9') { $code_name = 'Blue Onyx'; }
-        when ('10') { $code_name = 'Smoky Quartz'; }
+        when ('10') { $code_name = 'Red Quartz'; }
         when ('11') { $code_name = 'Lavender Calcite'; }
         default {
             $code_name = 'Green Obsidian';
@@ -102,7 +102,8 @@ sub desktop_vt {
     while ($xout =~ /tty(\d)/g) {
         $tty = $1;    # most recent match is probably best
     }
-    send_key "ctrl-alt-f${tty}";
+    select_console "tty${tty}-console";
+
     # work around https://gitlab.gnome.org/GNOME/gnome-software/issues/582
     # if it happens. As of 2019-05, seeing something similar on KDE too
     my $desktop = get_var('DESKTOP');
@@ -118,6 +119,16 @@ sub desktop_vt {
             type_very_safely "weakpassword\n";
         }
     }
+    else {
+        if (get_var("DISTRI") ne "rocky") {
+            type_very_safely "\t";
+            type_very_safely "\n";
+            type_very_safely "weakpassword\n";
+            wait_still_screen 3;
+            send_key 'alt-f1';
+        }
+    }
+    check_desktop(timeout => 120);
 }
 
 # Wait for login screen to appear. Handle the annoying GPU buffer
@@ -174,11 +185,24 @@ sub desktop_switch_layout {
     # if already selected, we're good
     return if (check_screen "${environment}_layout_${layout}", 3);
     # otherwise we need to switch
-    my $switcher = "alt-shift";    # anaconda
-    $switcher = "super-spc" if $environment eq 'gnome';
-    # KDE? not used yet
-    send_key $switcher;
-    assert_screen "${environment}_layout_${layout}", 3;
+    # in anaconda f42+ key combo switching doesn't work and can't be
+    # fixed - https://bugzilla.redhat.com/show_bug.cgi?id=2319565
+    if ($environment eq 'anaconda') {
+        my $count = 3;
+        while ($count) {
+            check_screen "anaconda_layout_indicator";
+            assert_and_click "anaconda_layout_indicator";
+            check_screen "anaconda_layout_${layout}";
+            return if (check_screen "anaconda_layout_${layout}", 3);
+            $count--;
+        }
+        die "never managed to switch to layout ${layout}!";
+    }
+    my $switcher = "super-spc";    # gnome; FIXME for other envs if used
+                                   # FIXME we use send_key_until_needlematch because sometimes the
+                                   # switch just doesn't work in gdm:
+                                   # https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/6066#note_1707051
+    send_key_until_needlematch("${environment}_layout_${layout}", $switcher, 3, 3);
 }
 
 # this is used at the end of console_login to check if we got a prompt
@@ -347,8 +371,9 @@ sub do_bootloader {
         ofw => get_var("OFW"),
         @_
     );
-    # if not postinstall not UEFI and not ofw, syslinux
-    $args{bootloader} //= ($args{uefi} || $args{postinstall} || $args{ofw}) ? "grub" : "syslinux";
+    # if not postinstall, not UEFI, not ofw, and not R10+, syslinux
+    my $version_major = get_version_major;
+    $args{bootloader} //= ($args{uefi} || $args{postinstall} || $args{ofw}) || ($version_major >= 10) ? "grub" : "syslinux";
     # we use the firmware-type specific tags because we want to be
     # sure we actually did a UEFI boot
     my $boottag = "bootloader_bios";
@@ -468,16 +493,11 @@ sub _repo_setup_compose {
     my $location = get_var("LOCATION");
     return unless $location;
     assert_script_run 'dnf config-manager --set-disabled updates-testing updates';
-    # script_run returns the exit code, so 'unless' here means 'if the file exists'
-    unless (script_run 'test -f /etc/yum.repos.d/fedora-updates-modular.repo') {
-        assert_script_run 'dnf config-manager --set-disabled updates-testing-modular updates-modular';
-    }
-    # we use script_run here as the rawhide and modular repo files
+    # we use script_run here as the rawhide repo files
     # won't always exist and we don't want to bother testing or
     # predicting their existence; assert_script_run doesn't buy you
     # much with sed as it'll return 0 even if it replaced nothing
     script_run "sed -i -e 's,^metalink,#metalink,g' -e 's,^mirrorlist,#mirrorlist,g' -e 's,^#baseurl.*basearch,baseurl=${location}/Everything/\$basearch,g' -e 's,^#baseurl.*source,baseurl=${location}/Everything/source,g' /etc/yum.repos.d/{fedora,fedora-rawhide}.repo", 0;
-    script_run "sed -i -e 's,^metalink,#metalink,g' -e 's,^mirrorlist,#mirrorlist,g' -e 's,^#baseurl.*basearch,baseurl=${location}/Modular/\$basearch,g' -e 's,^#baseurl.*source,baseurl=${location}/Modular/source,g' /etc/yum.repos.d/{fedora-modular,fedora-rawhide-modular}.repo", 0;
 
     # this can be used for debugging if something is going wrong
     #    unless (script_run 'pushd /etc/yum.repos.d && tar czvf yumreposd.tar.gz * && popd') {
@@ -505,10 +525,6 @@ sub _repo_setup_updates {
         # release at this point, but it won't *hurt* anything, so no
         # need to except that case really
         assert_script_run "dnf config-manager --set-disabled updates-testing";
-        # same for Modular, if appropriate
-        unless (script_run 'test -f /etc/yum.repos.d/fedora-updates-modular.repo') {
-            assert_script_run "dnf config-manager --set-disabled updates-testing-modular";
-        }
     }
 
     # Set up an additional repo containing the update or task packages. We do
@@ -647,7 +663,7 @@ sub console_initial_setup {
     type_string "c\n";
     wait_still_screen 7;
 
-    assert_screen "console_initial_SETUP_DONE", 30;
+    assert_screen "console_initial_setup_done", 30;
     type_string "c\n";    # continue
 }
 
@@ -747,12 +763,9 @@ sub gnome_initial_setup {
             }
         }
     }
-    unless (get_var("VNC_CLIENT")) {
-        # click 'Skip' one time (this is the 'goa' screen). We don't
-        # get it on VNC_CLIENT case as network isn't working (yet)
-        mouse_set(100, 100);
-        wait_screen_change { assert_and_click "skip_button"; };
-    }
+    # click 'Skip' one time (this is the 'goa' screen)
+    mouse_set(100, 100);
+    wait_screen_change { assert_and_click "skip_button"; };
     send_key "ret";
     if ($args{prelogin}) {
         # create user
@@ -799,7 +812,24 @@ sub anaconda_create_user {
         @_
     );
     my $user_login = get_var("USER_LOGIN") || "test";
-    assert_and_click("anaconda_install_user_creation", timeout => $args{timeout});
+    # In Rocky 10.x with default screen resolution of 1024x768 UI element
+    # changes (content and font) in main hub shift the User Creation button
+    # off screen preventing a needle match to enter user creation screen.
+    # Changing screen resolution of this test would bring the User Creation
+    # button on screen but would force recapture of *all* needles specifically
+    # for this test only.
+    # For now blindly assume we just finished creating the root user
+    # and use send_key to move to the next UI widget on the main hub which
+    # should be the User Creation button.
+    my $version_major = get_version_major;
+    if (($version_major > 9) && (get_var("LANGUAGE") eq "french")) {
+        send_key "tab";
+        wait_still_screen 1;
+        send_key "ret";
+        wait_still_screen 1;
+    } else {
+        assert_and_click("anaconda_install_user_creation", timeout => $args{timeout});
+    }
     assert_screen "anaconda_install_user_creation_screen";
     # wait out animation
     wait_still_screen 2;
@@ -821,7 +851,10 @@ sub anaconda_create_user {
         wait_still_screen 2;
         _type_user_password();
     }
-    assert_and_click "anaconda_install_user_creation_make_admin";
+    # In r10+ Add adminstrative privileges to this user account (wheel group membership) is selected
+    if ($version_major < 10) {
+        assert_and_click "anaconda_install_user_creation_make_admin";
+    }
     assert_and_click "anaconda_spoke_done";
     # since 20170105, we will get a warning here when the password
     # contains non-ASCII characters. Assume only switched layouts
@@ -851,32 +884,37 @@ sub check_desktop {
     # GNOME 40 starts on the overview by default; for consistency with
     # older GNOME and KDE, let's just close it
     if (match_has_tag "apps_menu_button_active") {
-        send_key "alt-f1";
+        # Rocky 9 and 10 with GNOME 40 and 47 start on the overview by default;
+        # check_desktop tries to detect this and deactivate with alt-f1 but this
+        # isn't working in 10.
+        if (get_var("DISTRI") eq "rocky" && (get_version_major() >= 9)) {
+            send_key "esc";
+        }
+        else {
+            send_key "alt-f1";
+        }
         assert_screen "apps_menu_button_inactive";
     }
 }
 
-sub download_modularity_tests {
-    # Download the modularity test script, place in the system and then
-    # modify the access rights to make it executable.
-    my ($whitelist) = @_;
-    # we need python3-yaml for the script to run
-    assert_script_run 'dnf -y install python3-yaml', 180;
-    assert_script_run 'curl -o /root/test.py https://pagure.io/fedora-qa/modularity_testing_scripts/raw/master/f/modular_functions.py';
-    if ($whitelist eq 'whitelist') {
-        assert_script_run 'curl -o /root/whitelist https://pagure.io/fedora-qa/modularity_testing_scripts/raw/master/f/whitelist';
-    }
-    assert_script_run 'chmod 755 /root/test.py';
-}
-
 sub quit_firefox {
     # Quit Firefox, handling the 'close multiple tabs' warning screen if
-    # it shows up
+    # it shows up. Expects to quit to a recognizable console
     send_key "ctrl-q";
     # expect to get to either the tabs warning or a console
     if (check_screen ["user_console", "root_console", "firefox_close_tabs"], 30) {
-        # if we hit the tabs warning, click it
-        click_lastmatch if (match_has_tag "firefox_close_tabs");
+        # if we hit a console we're good
+        unless (match_has_tag("firefox_close_tabs")) {
+            wait_still_screen 5;
+            return;
+        }
+        # otherwise we hit the tabs warning, click it
+        click_lastmatch;
+        # again, if we hit a console, we're good
+        if (check_screen ["user_console", "root_console"], 30) {
+            wait_still_screen 5;
+            return;
+        }
     }
     # it's a bit odd if we reach here, but could mean we quit to a
     # desktop, or the firefox_close_tabs needle went stale...
@@ -1061,6 +1099,10 @@ sub select_rescue_mode {
     }
     else {
         # select troubleshooting
+        if (get_var("DISTRI") eq "rocky" && (get_version_major() >= 9)) {
+            # Skip FIPS mode item in GRUB menu in Rocky 9+
+            send_key "down";
+        }
         send_key "down";
         send_key "ret";
         # select "rescue system"
@@ -1116,8 +1158,13 @@ sub menu_launch_type {
     # launcher, typing the specified string and hitting enter. Pass
     # the string to be typed to launch whatever it is you want.
     my $app = shift;
-    # super does not work on KDE, because fml
-    send_key 'alt-f1';
+    if (get_var("DISTRI") eq "rocky" && (get_version_major() >= 9)) {
+        send_key 'super';
+    }
+    else {
+        # super does not work on KDE, because fml
+        send_key 'alt-f1';
+    }
     # srsly KDE y u so slo
     wait_still_screen 3;
     type_very_safely $app;
@@ -1212,11 +1259,15 @@ sub check_prerelease {
     my $build = get_var('BUILD');
     # if it's a nightly installer image we should see tags
     $prerelease = 1 if ($build =~ /\.t\.\d+/ && !get_var("LIVE"));
-    # check based on ISO name, does not work for 8.x boot-iso name(s) which must use
-    # LABEL
-    my $iso = get_var('ISO');
-    $prerelease = 1 if ($iso =~ /^Rocky-\d+\.\d+-(B(?i)eta(?-i)|LookAhead)-(x86_64|aarch64|ppc64le|s390x)-(boot|dvd\d?|minimal).iso/);
-
+    if (get_var("DISTRI") eq "rocky") {
+        # Rocky generally POSTs with BUILD containing LookAhead, BETA or RC-#
+        # Match for PRERELEASE BUILDs
+        $prerelease = 1 if ($build =~ /^Rocky-\d+\.\d+-(B(?i)eta(?-i)|LookAhead)-\d+-/);
+        # Match for RELEASE CANDIDATE BUILDs
+        $prerelease = 0 if ($build =~ /^Rocky-\d+\.\d+-RC\d+-\d+.n.\d+/);
+        # Match for full release BUILDs
+        $prerelease = 0 if ($build =~ /^Rocky-\d+\.\d+-\d+.n.\d+/);
+    }
     # For all prerelease requiring ISOs, assert that prerelease is there.
     if ($prerelease == 1) {
         assert_screen "prerelease_note";
@@ -1323,6 +1374,26 @@ sub register_application {
     print("APPLICATION REGISTERED: $application \n");
 }
 
+# launch a terminal from a desktop, using the most efficient/reliable
+# approach (not appropriate if we really need to test launching it a
+# specific way)
+# Check, that the application has started.
+sub desktop_launch_terminal {
+    my $desktop = get_var("DESKTOP");
+    if ($desktop eq "i3") {
+        send_key "alt-ret";
+    }
+    elsif ($desktop eq "kde") {
+        send_key "ctrl-alt-t";
+    }
+    else {
+        my $string = 'terminal';
+        $string = 'ter;inql' if (get_var("LANGUAGE") eq 'french');
+        menu_launch_type($string, checkstart => 0);
+        assert_screen("apps_run_terminal");
+    }
+}
+
 # The KDE desktop tests are very difficult to maintain, because the transparency
 # of the menu requires a lot of different needles to cover the elements.
 # Therefore it is useful to change the background to a solid colour.
@@ -1379,6 +1450,161 @@ sub solidify_wallpaper {
         # check that is has changed color
         assert_screen 'apps_settings_screen_black';
     }
+}
+
+# This routine is used in Desktop test suites, such as Evince or Gedit.
+# It checks if git is installed and installs it, if necessary.
+sub check_and_install_git {
+    unless (get_var("CANNED")) {
+        if (script_run("rpm -q git")) {
+            assert_script_run("dnf install -y git");
+        }
+    }
+}
+
+# This routine is used in Desktop test suites. It downloads the test data from
+# the repository and populates the directory structure.
+# The data repository is located at https://pagure.io/fedora-qa/openqa_testdata.
+
+sub download_testdata {
+    # We can select which Data to copy over.
+    my $data = shift;
+    $data = 'structure' unless ($data);
+    # Navigate to the user's home directory
+    my $user = get_var("USER_LOGIN") // "test";
+    assert_script_run("cd /home/$user/");
+    # Create a temporary directory to unpack the zipped file.
+    assert_script_run("mkdir temp");
+    assert_script_run("cd temp");
+    # Download the compressed file with the repository content.
+    assert_script_run("curl --retry-delay 10 --max-time 120 --retry 5 -o repository.tar.gz https://pagure.io/fedora-qa/openqa_testdata/blob/thetree/f/repository.tar.gz", timeout => 600);
+    # Untar it.
+    assert_script_run("tar -zxvf repository.tar.gz");
+    # Copy out the files into the VMs directory structure.
+    if ($data eq "structure") {
+        assert_script_run("cp music/* /home/$user/Music");
+        assert_script_run("cp documents/* /home/$user/Documents");
+        assert_script_run("cp pictures/* /home/$user/Pictures");
+        assert_script_run("cp video/* /home/$user/Videos");
+        assert_script_run("cp reference/* /home/$user/");
+    }
+    else {
+        assert_script_run("mkdir /home/$user/$data");
+        assert_script_run("cp $data/* /home/$user/$data/");
+    }
+    # Delete the temporary directory and the downloaded file.
+    assert_script_run("cd");
+    assert_script_run("rm -rf /home/$user/temp");
+    # Change ownership
+    assert_script_run("chown -R test:test /home/$user/");
+}
+
+# On Fedora, the serial console is not writable for regular users which lames
+# some of the openQA commands that send messages to the serial console to check
+# that a command has finished, for example assert_script_run, etc.
+# This routine changes the rights on the serial console file and makes it
+# writable for everyone, so that those commands work. This is actually very useful
+# for testing commands from users' perspective. The routine also handles becoming the root.
+# We agree that this is not the "correct" way, to enable users to type onto serial console
+# and that it correctly should be done via groups (dialout) but that would require rebooting
+# the virtual machine. Therefore we do it this way, which has immediate effect.
+sub make_serial_writable {
+    become_root();
+    sleep 2;
+    # Make serial console writable for everyone.
+    enter_cmd("chmod 666 /dev/${serialdev}");
+    sleep 2;
+    # Exit the root account
+    enter_cmd("exit");
+    sleep 2;
+}
+
+# Sometimes, especially in between freezes, there are Software Updates available
+# that trigger a notification pop-up which covers some part of the screen
+# and possibly steals focus from the applications, thus making tests to fail.
+# This will set the update notification timestamp to the current time (-30 seconds),
+# forcing the notification mechanism to think it already had notified.
+# Note, that this has to be run under the user under which the tests run,
+# not root.
+sub set_update_notification_timestamp {
+    # Get the current time
+    my $ep_time = time();
+    # Subtract 30 seconds from the number.
+    $ep_time -= 30;
+    # Run a command using the command dialogue
+    send_key('alt-f2');
+    wait_still_screen(2);
+    # Set the new timestamp using the gsettings command.
+    type_very_safely("gsettings set org.gnome.software update-notification-timestamp $ep_time\n");
+}
+
+# This routine takes a list of applications. It will then use the terminal
+# to start all these applications in the background and then it will exit the
+# terminal. This is useful when we want to start multiple applications quickly.
+sub start_applications {
+    my @applications = @_;
+    # Open the terminal
+    desktop_launch_terminal();
+    assert_screen("apps_run_terminal");
+    wait_still_screen(2);
+    # Iterate over the application list
+    # and start each application from it.
+    foreach (@applications) {
+        assert_script_run("$_ &");
+        # Take some time for things to settle.
+        wait_still_screen(1);
+    }
+    # Exit the terminal.
+    enter_cmd("exit");
+}
+
+# this is a workaround for an annoying KDE bug where the first character
+# typed into the launcher is often repeated. I think it's due to KDE
+# working hard to cache all the launchers, or something, so we try to
+# work around it by doing a 'throwaway' open, type a 'k', wait a bit,
+# close operation before we do anything 'real'. this is repeated in
+# several tests so we share it here
+sub kde_doublek_workaround {
+    my %args = @_;
+    $args{key} //= 'k';
+    wait_screen_change { send_key 'super'; };
+    wait_still_screen 3;
+    send_key $args{key};
+    wait_still_screen 5;
+    send_key 'esc';
+    wait_still_screen 3;
+}
+
+# handle login at a graphical DM once we have reached the initial
+# DM screen. Factored out of _graphical_wait_login for reuse by
+# tests that reboot and need to login afterwards
+sub dm_perform_login {
+    my ($desktop, $password) = @_;
+    # GDM 3.24.1 dumps a cursor in the middle of the screen here...
+    mouse_hide;
+    if ($desktop eq 'gnome') {
+        # we have to hit enter to get the password dialog, and it
+        # doesn't always work for some reason so just try it three
+        # times
+        send_key_until_needlematch("graphical_login_input", "ret", 3, 5);
+    }
+    assert_screen "graphical_login_input";
+    # seems like we often double-type on aarch64 if we start right
+    # away
+    wait_still_screen(stilltime => 5, similarity_level => 38);
+    if (get_var("SWITCHED_LAYOUT")) {
+        # see _do_install_and_reboot; when layout is switched
+        # user password is doubled to contain both US and native
+        # chars
+        desktop_switch_layout 'ascii';
+        type_very_safely $password;
+        desktop_switch_layout 'native';
+        type_very_safely $password;
+    }
+    else {
+        type_very_safely $password;
+    }
+    send_key "ret";
 }
 
 1;

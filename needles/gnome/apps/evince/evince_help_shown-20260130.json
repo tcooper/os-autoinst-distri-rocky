@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "width": 349,
+      "type": "match",
+      "height": 47,
+      "ypos": 104,
+      "xpos": 62
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "evince_help_shown"
+  ]
+}

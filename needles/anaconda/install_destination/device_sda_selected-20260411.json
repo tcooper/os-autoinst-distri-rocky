@@ -1,0 +1,17 @@
+{
+  "area": [
+    {
+      "xpos": 215,
+      "ypos": 277,
+      "type": "match",
+      "height": 15,
+      "width": 83
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "anaconda_part_device_sda",
+    "anaconda_part_device_sda_selected",
+    "ENV-DISTRI-rocky"
+  ]
+}

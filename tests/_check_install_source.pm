@@ -3,6 +3,7 @@ use strict;
 use testapi;
 use anaconda;
 use File::Basename;
+use utils;
 
 sub run {
     my $self = shift;
@@ -12,6 +13,8 @@ sub run {
         $repourl = get_mirrorlist_url();
     }
     else {
+        # we kinda intentionally don't check ADD_REPOSITORY_GRAPHICAL
+        # here, as we cover that case with a postinstall check
         $repourl = get_var("REPOSITORY_VARIATION", get_var("REPOSITORY_GRAPHICAL"));
         $repourl = get_full_repo($repourl) if ($repourl);
         $addrepourl = get_var("ADD_REPOSITORY_VARIATION");
@@ -22,12 +25,23 @@ sub run {
     $self->root_console;
     if ($addrepourl) {
         if ($addrepourl =~ m,^nfs://,,) {
-            # this line tells us it set up a repo for our URL...
-            assert_script_run 'grep "repo addrepo.*' . ${addrepourl} . '" /tmp/packaging.log';
-            # ...this line tells us it added the repo called 'addrepo'...
-            assert_script_run 'grep "\(added\|enabled\) repo: .addrepo." /tmp/packaging.log';
-            # ...and this line tells us it worked (I hope)
-            assert_script_run 'grep "enabled repo.*nfs" /tmp/packaging.log';
+            # this line tells us it set up a repo for our URL.
+            # "repo addrepo" is older format from before Fedora 37,
+            # "Add the 'addrepo" is newer format from F37+
+            assert_script_run 'grep "\(repo \|Add the \'\)addrepo.*' . ${addrepourl} . '" /tmp/packaging.log';
+
+            # ...this line tells us it added the repo called 'addrepo' (<F36)...
+            if (script_run 'grep "\(added\|enabled\) repo: .addrepo." /tmp/packaging.log') {
+                # this is F36+
+                assert_script_run 'grep "Added the ' . "'addrepo'" . '" /tmp/anaconda.log';
+            }
+
+            # ...and one of these tells us it worked (I hope). This one is <F35...
+            if (script_run 'grep "enabled repo.*nfs" /tmp/packaging.log') {
+                # ...these are F35+
+                assert_script_run 'grep "Load metadata for the ' . "'addrepo'" . '" /tmp/anaconda.log';
+                assert_script_run 'grep "Loaded metadata from.*file:///run/install/addrepo.nfs" /tmp/anaconda.log';
+            }
         }
     }
     if ($repourl =~ /^hd:/) {
@@ -55,14 +69,36 @@ sub run {
         # expression at the bash level, and single quotes around the
         # text 'anaconda' at the level of grep, as the string we're
         # actually matching on literally has 'anaconda' in it.
-        if (script_run 'grep "enabled repo: ' . "'anaconda'.*${repourl}" . '" /tmp/packaging.log') {
-            # in F35+, the "enabled repo" log line is gone, instead
-            # we'll check some log messages from the dnf manager module
-            # that show up in anaconda.log. Can drop the above branch
-            # and only go with the below branch after F34 EOL
-            assert_script_run 'grep "added repo: ' . "'anaconda'.*${repourl}" . '" /tmp/packaging.log';
-            assert_script_run 'grep "Load metadata for the ' . "'anaconda'" . '" /tmp/anaconda.log';
-            assert_script_run 'grep "Loaded metadata from ' . ".*${repourl}" . '" /tmp/anaconda.log';
+        if ((get_var("DISTRI") eq "rocky") && (get_version_major() < 10)) {
+            if (script_run 'grep "enabled repo: ' . "'anaconda'.*${repourl}" . '" /tmp/packaging.log') {
+                # in F35+, the "enabled repo" log line is gone, instead
+                # we'll check some log messages from the dnf manager module
+                # that show up in anaconda.log. Can drop the above branch
+                # and only go with this branch after F34 EOL.
+                #
+                # in F36+, the "added repo: " line in packaging.log is
+                # gone too, instead we get "Added the 'XXX' repository"
+                # in anaconda.log
+                if (script_run 'grep "added repo: ' . "'anaconda'.*${repourl}" . '" /tmp/packaging.log') {
+                    assert_script_run 'grep "Added the ' . "'anaconda'" . '" /tmp/anaconda.log';
+                }
+                assert_script_run 'grep "Load metadata for the ' . "'anaconda'" . '" /tmp/anaconda.log';
+                assert_script_run 'grep "Loaded metadata from ' . ".*${repourl}" . '" /tmp/anaconda.log';
+            }
+        }
+        else {
+            # The above entries are in /tmp/packging.log for Rocky 10+
+            if (script_run 'grep "Added the \'anaconda\'" /tmp/anaconda.log') {
+                assert_script_run 'grep "Added the \'anaconda\'" /tmp/packaging.log';
+                assert_script_run 'grep "Load metadata for the \'anaconda\'" /tmp/packaging.log';
+                assert_script_run 'grep "Loaded metadata from.*' . ${repourl} . '" /tmp/packaging.log';
+            }
+            # These are new log entries for newer Fedora releases, keep in case log destination changes
+            else {
+                assert_script_run 'grep "Added the \'anaconda\'" /tmp/anaconda.log';
+                assert_script_run 'grep "Load metadata for the \'anaconda\'" /tmp/anaconda.log';
+                assert_script_run 'grep "Loaded metadata from.*' . ${repourl} . '" /tmp/anaconda.log';
+            }
         }
     }
     if ($repourl) {
@@ -82,7 +118,7 @@ sub run {
     # just for convenience - sometimes it's useful to see this log
     # for a success case
     upload_logs "/tmp/packaging.log", failok => 1;
-    send_key "ctrl-alt-f6";
+    select_console "tty6-console";
 
     # Anaconda hub
     assert_screen "anaconda_main_hub", 30;    #

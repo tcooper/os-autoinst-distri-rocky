@@ -5,7 +5,12 @@ use utils;
 
 our $desktop = get_var("DESKTOP");
 our $syspwd = get_var("USER_PASSWORD") || "weakpassword";
+our $version_major = get_version_major;
 our $term = "gnome-terminal";
+# Rocky 10 uses command name terminal in launcher instead of gnome-terminal
+if (get_var("DISTRI") eq "rocky" && ($version_major >= 10)) {
+    $term = "terminal";
+}
 if ($desktop eq "kde") {
     $term = "konsole";
 }
@@ -101,6 +106,10 @@ sub check_user_logged_in {
     # Reading the login name from the terminal prompt seems to be
     # the most reliable thing to do.
     if ($desktop eq "gnome") {
+        # See utils.pm/check_desktop() for justification
+        if (get_var("DISTRI") eq "rocky" && ($version_major >= 10)) {
+            assert_and_click "apps_menu_button";
+        }
         menu_launch_type $term;
         wait_still_screen 2;
         $exitkey = "alt-f4";
@@ -151,25 +160,33 @@ sub reboot_system {
     if (check_screen "system_menu_button") {
         # In a logged in desktop, we access power options through system menu
         assert_and_click "system_menu_button";
-        # In KDE since F34, reboot entry is right here, otherwise we need to
-        # enter some kind of power option submenu
-        assert_screen ["power_entry", "reboot_entry"];
-        click_lastmatch;
-        if (match_has_tag("power_entry")) {
-            my $relnum = get_release_number;
-            my $version_major = get_version_major;
-            if ($desktop eq "gnome" && (($relnum < 33) || ($version_major < 9))) {
-                # In GNOME before F33, some of the entries are brought together, while
-                # in KDE and GNOME from F33 onwards they are split and it does not seem
-                # correct to me to assign restarting tags to needles powering off the
-                # machine. So I split this for KDE and GNOME < F33:
-                assert_and_click "power_off_entry";
-            }
-            else {
-                # And for KDE and GNOME >= F33:
-                assert_and_click "reboot_entry";
-            }
+        # Add non-KDE option for Rocky
+        if (get_var("DISTRI") eq "rocky") {
+            # Enter power option submenu and reboot
+            assert_and_click "power_entry";
+            assert_and_click "reboot_entry";
             assert_and_click "restart_confirm";
+        }
+        else {
+            # In KDE since F34, reboot entry is right here, otherwise we need to
+            # enter some kind of power option submenu
+            assert_screen ["power_entry", "reboot_entry"];
+            click_lastmatch;
+            if (match_has_tag("power_entry")) {
+                my $relnum = get_release_number;
+                if ($desktop eq "gnome" && (($relnum < 33) || ($version_major < 9))) {
+                    # In GNOME before F33, some of the entries are brought together, while
+                    # in KDE and GNOME from F33 onwards they are split and it does not seem
+                    # correct to me to assign restarting tags to needles powering off the
+                    # machine. So I split this for KDE and GNOME < F33:
+                    assert_and_click "power_off_entry";
+                }
+                else {
+                    # And for KDE and GNOME >= F33:
+                    assert_and_click "reboot_entry";
+                }
+                assert_and_click "restart_confirm";
+            }
         }
     }
     # When we are outside KDE (not logged in), the only way to reboot is to click
@@ -183,12 +200,21 @@ sub reboot_system {
 sub power_off {
     # Powers-off the machine.
     assert_and_click "system_menu_button";
-    # in KDE since F34, there's no submenu to access, the button is right here
-    assert_screen ["power_entry", "power_off_entry"];
-    click_lastmatch;
-    assert_and_click "power_off_entry" if (match_has_tag("power_entry"));
-    assert_and_click "power_off_confirm";
-    assert_shutdown;
+    # Add non-KDE option for Rocky
+    if (get_var("DISTRI") eq "rocky") {
+        # Enter power option submenu and power-off
+        assert_and_click "power_entry";
+        assert_and_click "power_off_entry";
+        assert_and_click "power_off_confirm";
+    }
+    else {
+        # in KDE since F34, there's no submenu to access, the button is right here
+        assert_screen ["power_entry", "power_off_entry"];
+        click_lastmatch;
+        assert_and_click "power_off_entry" if (match_has_tag("power_entry"));
+        assert_and_click "power_off_confirm";
+        assert_shutdown;
+    }
 }
 
 sub run {
@@ -200,9 +226,25 @@ sub run {
     # replace the wallpaper with a black image, this should work for
     # all desktops. Takes effect after a logout / login cycle
     $self->root_console(tty => 3);
-    assert_script_run "dnf -y install GraphicsMagick", 300;
-    assert_script_run "gm convert -size 1024x768 xc:black /usr/share/backgrounds/black.png";
-    assert_script_run 'for i in /usr/share/backgrounds/f*/default/*.png; do ln -sf /usr/share/backgrounds/black.png $i; done';
+    # Rocky Linux still uses ImageMagick while Fedora uses GraphicsMagick
+    # That said, convert by itself in Rocky 10 is deprecated.
+    if (get_var("DISTRI") eq "rocky") {
+        assert_script_run "dnf -y install epel-release", 180;
+        assert_script_run "dnf config-manager --set-enabled epel", 60;
+        assert_script_run "dnf -y install ImageMagick", 300;
+        if (get_var("DISTRI") eq "rocky" && ($version_major >= 10)) {
+            assert_script_run "magick convert -size 1024x768 xc:black /usr/share/backgrounds/black.png";
+        }
+        else {
+            assert_script_run "convert -size 1024x768 xc:black /usr/share/backgrounds/black.png";
+        }
+        assert_script_run 'for i in /usr/share/backgrounds/rocky-default-*.png; do ln -sf /usr/share/backgrounds/black.png $i; done';
+    }
+    else {
+        assert_script_run "dnf -y install GraphicsMagick", 300;
+        assert_script_run "gm convert -size 1024x768 xc:black /usr/share/backgrounds/black.png";
+        assert_script_run 'for i in /usr/share/backgrounds/f*/default/*.png; do ln -sf /usr/share/backgrounds/black.png $i; done';
+    }
     if ($desktop eq "kde") {
         # use solid blue background for SDDM
         assert_script_run "sed -i -e 's,image,solid,g' /usr/share/sddm/themes/01-breeze-fedora/theme.conf.user";
@@ -251,7 +293,7 @@ sub run {
     # Try to log in with either account, intentionally entering the wrong password.
     login_user(user => "jack", password => "wrongpassword", checklogin => 0);
     my $relnum = get_release_number;
-    if ($desktop eq "gnome" && $relnum < 34) {
+    if ($desktop eq "gnome" && $relnum < 34 && get_var("DISTRI") ne "rocky") {
         # In GDM before F34, a message is shown about an unsuccessful login
         # and it can be asserted, so let's do it. In SDDM and GDM F34+,
         # there is also a message, but it is only displayed for a short
@@ -281,6 +323,10 @@ sub run {
 
         # Start a terminal session to monitor on which sessions we are, when we start switching users.
         # This time, we will open the terminal window manually because we want to leave it open later.
+        # See utils.pm/check_desktop() for justification
+        if (get_var("DISTRI") eq "rocky" && ($version_major >= 10)) {
+            assert_and_click "apps_menu_button";
+        }
         menu_launch_type "terminal";
         wait_still_screen 2;
         # Initiate switch user

@@ -1,0 +1,23 @@
+{
+  "area": [
+    {
+      "xpos": 785,
+      "width": 62,
+      "ypos": 292,
+      "type": "match",
+      "height": 17
+    },
+    {
+      "xpos": 951,
+      "height": 19,
+      "type": "match",
+      "ypos": 87,
+      "width": 20
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "firefox_addon_success"
+  ]
+}

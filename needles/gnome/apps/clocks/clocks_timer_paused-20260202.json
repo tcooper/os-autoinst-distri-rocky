@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "width": 173,
+      "type": "match",
+      "height": 70,
+      "ypos": 194,
+      "xpos": 427
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "clocks_timer_paused"
+  ]
+}

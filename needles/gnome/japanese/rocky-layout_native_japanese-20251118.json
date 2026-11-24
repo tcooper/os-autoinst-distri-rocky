@@ -1,0 +1,17 @@
+{
+  "area": [
+    {
+      "height": 18,
+      "ypos": 8,
+      "width": 18,
+      "xpos": 888,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "LANGUAGE-japanese",
+    "gnome_layout_native"
+  ]
+}

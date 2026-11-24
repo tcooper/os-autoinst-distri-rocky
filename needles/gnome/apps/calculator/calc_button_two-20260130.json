@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "ypos": 521,
+      "type": "match",
+      "height": 25,
+      "width": 28,
+      "xpos": 249
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "calc_button_two"
+  ]
+}

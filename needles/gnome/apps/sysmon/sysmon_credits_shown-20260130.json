@@ -1,0 +1,23 @@
+{
+  "area": [
+    {
+      "width": 68,
+      "type": "match",
+      "ypos": 91,
+      "height": 20,
+      "xpos": 478
+    },
+    {
+      "xpos": 342,
+      "ypos": 149,
+      "width": 62,
+      "height": 20,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "sysmon_credits_shown"
+  ]
+}

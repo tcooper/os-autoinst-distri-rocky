@@ -31,6 +31,23 @@ sub run {
     send_key 'alt-f1';
     # wait out animations
     wait_still_screen(stilltime => 4, similarity_level => 45);
+
+    # Rocky 10 doesn't have Firefox in the dash. Add it...
+    if (get_var("DISTRI") eq "rocky" && (get_version_major() >= 10)) {
+        if (get_var("BOOTFROM")) {
+            # Need a user terminal to do this...
+            assert_and_click "apps_menu_button";
+            menu_launch_type('terminal');
+            assert_screen "apps_run_terminal";
+            # FIXME: Hard code for now to test. Better solution is to get the current setting and add Firefox
+            my $dash_apps = "\"['firefox.desktop', 'org.gnome.Software.desktop', 'org.gnome.Ptyxis.desktop', 'org.gnome.TextEditor.desktop', 'org.gnome.Calculator.desktop']\"";
+            script_run "gsettings set org.gnome.shell favorite-apps ${dash_apps}", 0;
+            sleep 2;
+            type_very_safely "exit\n";
+            assert_and_click "apps_menu_button";
+        }
+    }
+
     assert_and_click 'browser_launcher';
     assert_screen 'browser', 45;
     # firefox is quite grindy on startup, let it settle
@@ -42,24 +59,20 @@ sub run {
     sleep 3;
     # check Rocky Linux Account Service, typing slowly to avoid errors
     type_very_safely "https://accounts.rockylinux.org/\n";
-    assert_screen "browser_fas_home";
+    assert_screen "browser_ras_home";
     _open_new_tab;
     wait_still_screen(stilltime => 2, similarity_level => 45);
     sleep 2;
     type_very_safely "https://kernel.org\n";
     assert_and_click "browser_kernelorg_patch";
     wait_still_screen(stilltime => 2, similarity_level => 45);
-    assert_and_click "browser_download_save";
-    sleep 2;
-    send_key 'ret';
-    wait_still_screen(stilltime => 3, similarity_level => 45);
     # browsers do...something...when the download completes, and we
     # expect there's a single click to make it go away and return
     # browser to a state where we can open a new tab
     assert_and_click "browser_download_complete";
     wait_still_screen(stilltime => 2, similarity_level => 45);
     # we'll check it actually downloaded later
-    # add-on test: at present all desktops we test (KDE, GNOME) are
+    # add-on test: at present all desktops we test (GNOME) are
     # using Firefox by default so we do this unconditionally, but we
     # may need to conditionalize it if we ever test desktops whose
     # default browser doesn't support add-ons or uses different ones

@@ -21,8 +21,12 @@ sub run {
     type_safely "\n\t\t\t";
     # set DNS from host
     type_safely join(',', get_host_dns());
+    # save changes
     type_safely "\t\t\t\t\t\n";
-    assert_and_click "anaconda_network_connect";
+    # Rocky 9+ connect automatically on save
+    if (get_version_major() < 9) {
+        assert_and_click "anaconda_network_connect";
+    }
     # can take a bit of time as it seems to wait for all the pending
     # DHCP requests to time out before applying the static config
     assert_screen "anaconda_network_connected", 90;

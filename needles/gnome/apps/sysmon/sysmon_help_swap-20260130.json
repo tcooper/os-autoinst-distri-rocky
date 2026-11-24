@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "type": "match",
+      "height": 21,
+      "ypos": 166,
+      "width": 80,
+      "xpos": 462
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "sysmon_help_swap"
+  ]
+}

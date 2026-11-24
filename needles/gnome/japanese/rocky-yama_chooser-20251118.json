@@ -1,0 +1,18 @@
+{
+  "area": [
+    {
+      "xpos": 383,
+      "type": "match",
+      "width": 33,
+      "ypos": 120,
+      "height": 20
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "DESKTOP-gnome",
+    "ENV-DISTRI-rocky",
+    "LANGUAGE-japanese",
+    "desktop_yama_chooser"
+  ]
+}

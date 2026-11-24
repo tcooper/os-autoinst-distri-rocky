@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "xpos": 57,
+      "ypos": 369,
+      "width": 476,
+      "height": 19,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "browser_ras_home"
+  ]
+}

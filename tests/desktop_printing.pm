@@ -5,6 +5,7 @@ use utils;
 
 sub run {
     my $self = shift;
+    my $version_major = get_version_major;
     # Prepare the environment:
     #
     # Become root
@@ -15,19 +16,30 @@ sub run {
     assert_script_run "echo 'A quick brown fox jumps over a lazy dog.' > testfile.txt";
     script_run "chmod 666 testfile.txt";
     # Install the Cups-PDF package to use the Cups-PDF printer
-    assert_script_run "dnf -y install cups-pdf", 180;
-    # FIXME: log version of cups-pdf and check it for output location
-    # this is only necessary as long as the test may run on cups-pdf
-    # 3.0.1-11 or lower, as soon as that's not true we can cut it
-    my $cpdfver = script_output 'rpm -q cups-pdf --queryformat "%{VERSION}-%{RELEASE}\n"';
-    assert_script_run "dnf -y install rpmdevtools", 180;
-    my $cpdfvercmp = script_run "rpmdev-vercmp $cpdfver 3.0.1-11.5";
+    # Rocky may not have epel repositories installed or enabled so install/enable them
+    # Rocky 10 does not have Evince so provide mupdf for Gnome
+    if ((get_var('DISTRI') eq "rocky")) {
+        assert_script_run "dnf -y install epel-release", 180;
+        assert_script_run "dnf config-manager --set-enabled epel";
+    }
+    if (get_var("DISTRI") eq "rocky" && ($version_major >= 10)) {
+        assert_script_run "dnf config-manager --set-enabled crb";
+        assert_script_run "dnf -y --releasever=$version_major install cups-pdf", 180;
+        assert_script_run "dnf -y install mupdf", 180;
+    }
+    else {
+        assert_script_run "dnf -y install cups-pdf", 180;
+    }
     # Leave the root terminal and switch back to desktop.
     desktop_vt();
     my $desktop = get_var("DESKTOP");
     # some simple variances between desktops. defaults are for GNOME
     my $editor = "gedit";
     my $viewer = "evince";
+    if (get_var("DISTRI") eq "rocky" && ($version_major >= 10)) {
+        $editor = "gnome-text-editor";
+        $viewer = "mupdf";
+    }
     my $maximize = "super-up";
     if ($desktop eq "kde") {
         $editor = "kwrite";
@@ -64,11 +76,8 @@ sub run {
     # Open the pdf file and check the print
     send_key "alt-f2";
     wait_still_screen(stilltime => 5, similarity_level => 45);
-    # output location is different for cups-pdf 3.0.1-12 or later (we
-    # checked this above)
-    if ($cpdfvercmp eq "12") {
-        # older cups-pdf
-        type_safely "$viewer /home/test/Desktop/testfile.pdf\n";
+    if (get_var("DISTRI") eq "rocky" && ($version_major >= 10)) {
+        type_safely "$viewer /home/test/Desktop/gnome-text-editor_job__1-job_1.pdf\n";
     }
     else {
         type_safely "$viewer /home/test/Desktop/testfile-job_1.pdf\n";

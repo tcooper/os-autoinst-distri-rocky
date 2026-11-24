@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "ypos": 93,
+      "xpos": 442,
+      "width": 138,
+      "type": "match",
+      "height": 46
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "navigation_three_workspaces"
+  ]
+}

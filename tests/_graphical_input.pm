@@ -6,12 +6,27 @@ use utils;
 sub run {
     my $relnum = get_release_number;
     my $version_major = get_version_major;
-    if (get_var("LANGUAGE") eq 'japanese' && (($relnum > 33) || ($version_major > 8))) {
+
+    # give GNOME a minute to settle
+    wait_still_screen 5;
+    if (get_var("LANGUAGE") eq 'japanese' && ($version_major > 8) && !check_screen ['gnome_layout_native', 'gnome_layout_ascii']) {
+        if (get_var("LIVE")) {
+            record_soft_failure "g-i-s should have done this already - https://bugzilla.redhat.com/show_bug.cgi?id=2402147";
+        }
         # since g-i-s new user mode was dropped and the replacement
         # doesn't do input method selection, and anaconda never has,
-        # we have to set up the input method manually:
+        # on the netinst path we have to set up the input
+        # method manually:
         # https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/3749
-        menu_launch_type "keyboard";
+        # we also have to do this for live installs until
+        # https://bugzilla.redhat.com/show_bug.cgi?id=2402147
+        # is fixed
+        menu_launch_type "input";
+        unless (check_screen "desktop_add_input_source", 30) {
+            # first attempt to run this often fails for some reason
+            check_desktop;
+            menu_launch_type "input";
+        }
         assert_and_click "desktop_add_input_source";
         assert_and_click "desktop_input_source_japanese";
         assert_and_click "desktop_input_source_japanese_anthy";
@@ -21,7 +36,12 @@ sub run {
     }
     # do this from the overview because the desktop uses the stupid
     # transparent top bar which messes with our needles
-    send_key "alt-f1";
+    if ($version_major < 10) {
+        send_key "alt-f1";
+    }
+    else {
+        send_key "super";
+    }
     assert_screen "overview_app_grid";
     # check both layouts are available at the desktop; here,
     # we can expect input method switching to work too
@@ -34,7 +54,7 @@ sub run {
         # wait a bit for input switch to complete
         sleep 3;
 
-        # assume we can test input from whatever 'alt-f1' opened
+        # assume we can test input from whatever 'alt-f1'/'super' opened
         type_safely "yama";
         assert_screen "desktop_yama_hiragana";
         send_key "spc";
@@ -50,7 +70,7 @@ sub run {
 }
 
 sub test_flags {
-    return {fatal => 1};
+    return {fatal => 1, always_rollback => 1};
 }
 
 1;

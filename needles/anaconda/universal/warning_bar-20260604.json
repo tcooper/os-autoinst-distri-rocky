@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "xpos": 451,
+      "height": 34,
+      "width": 288,
+      "type": "match",
+      "ypos": 724
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "anaconda_warning_bar"
+  ]
+}

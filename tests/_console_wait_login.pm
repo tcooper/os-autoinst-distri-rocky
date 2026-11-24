@@ -9,6 +9,9 @@ sub run {
     my $wait_time = 600;
     $wait_time = 6000 if (get_var("UPGRADE"));
 
+    # Rocky 10+ install_iscsi takes a really long time to get to the login screen
+    $wait_time = 6000 if ((get_var("ENV_DISTRI") eq "rocky") && (get_var("PARTITIONING") eq "custom_iscsi"));
+
     # handle bootloader, if requested
     if (get_var("GRUB_POSTINSTALL")) {
         do_bootloader(postinstall => 1, params => get_var("GRUB_POSTINSTALL"), timeout => $wait_time);

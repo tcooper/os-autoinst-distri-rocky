@@ -9,12 +9,18 @@ sub run {
 
     # switch to TTY3 for both, graphical and console tests
     $self->root_console(tty => 3);
+    my $version_major = get_version_major();
 
     # enable test repos and install test packages
     prepare_test_packages;
 
     # check rpm agrees they installed good
     verify_installed_packages;
+
+    # acpica-tools package is in CRB in Rocky 10+
+    if (get_var("DISTRI") eq "rocky" && ($version_major >= 10)) {
+        assert_script_run "dnf config-manager --set-enabled crb";
+    }
 
     # update the fake acpica-tools (should come from the real repo)
     # this can take a long time if we get unlucky with the metadata refresh

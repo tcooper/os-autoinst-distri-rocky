@@ -147,8 +147,8 @@ sub load_install_tests() {
     # boot phase is loaded automatically every time
     autotest::loadtest "tests/_boot_to_anaconda.pm";
 
-    # if this is a kickstart or VNC install, that's all folks
-    return if (get_var("KICKSTART") || get_var("VNC_SERVER"));
+    # if this is a kickstart install, that's all folks
+    return if (get_var("KICKSTART"));
 
     # Root password and user creation spokes are suppressed on
     # Workstation live install and Silverblue DVD install, so we do
@@ -215,9 +215,10 @@ sub load_install_tests() {
         autotest::loadtest "tests/_anaconda_kdump_disable.pm";
     }
 
-    # Start installation, set user & root passwords, reboot
-    # install and reboot phase is loaded automatically every time (except when KICKSTART is set)
-    autotest::loadtest "tests/_do_install_and_reboot.pm";
+    # Set user & root passwords, start installation, reboot
+    # these are loaded automatically every time (except when (PARTIAL_)KICKSTART is set)
+    autotest::loadtest 'tests/_do_root_and_user.pm' unless (get_var('PARTIAL_KICKSTART'));
+    autotest::loadtest 'tests/_do_install_and_reboot.pm';
 }
 
 sub _load_instance {
@@ -281,10 +282,6 @@ sub load_postinstall_tests() {
     # the installed system: just load its test and return
     if (get_var("MEMCHECK")) {
         autotest::loadtest "tests/_memcheck.pm";
-        return;
-    }
-    # VNC client test's work is done once install is complete
-    if (get_var("VNC_CLIENT")) {
         return;
     }
 

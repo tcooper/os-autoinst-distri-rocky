@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "xpos": 233,
+      "ypos": 113,
+      "type": "match",
+      "height": 24,
+      "width": 71
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "clocks_city_added_reykjavik"
+  ]
+}

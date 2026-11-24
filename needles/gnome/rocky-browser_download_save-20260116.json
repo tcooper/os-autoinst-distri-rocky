@@ -1,0 +1,17 @@
+{
+  "area": [
+    {
+      "xpos": 884,
+      "ypos": 87,
+      "width": 15,
+      "height": 18,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "browser_download_save",
+    "firefox_download_save"
+  ]
+}

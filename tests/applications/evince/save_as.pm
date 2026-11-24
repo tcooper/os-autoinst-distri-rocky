@@ -13,6 +13,13 @@ sub run {
 
     # Select Save As
     assert_and_click("evince_menu_saveas", button => "left", timeout => 30);
+    wait_still_screen(2);
+
+    # Ensure we're in Documents directory and Select filename to edit
+    assert_and_click("evince_documents");
+
+    # Select filename
+    assert_and_dclick("evince_select_file");
 
     # Type a new name.
     type_very_safely("alternative");

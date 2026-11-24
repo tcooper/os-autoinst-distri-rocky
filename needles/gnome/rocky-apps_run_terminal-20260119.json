@@ -1,0 +1,22 @@
+{
+  "area": [
+    {
+      "width": 21,
+      "type": "match",
+      "ypos": 118,
+      "height": 22,
+      "xpos": 194
+    },
+    {
+      "xpos": 302,
+      "type": "match",
+      "height": 20,
+      "ypos": 160,
+      "width": 25
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "apps_run_terminal"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "area": [
+    {
+      "xpos": 282,
+      "ypos": 674,
+      "width": 62,
+      "height": 62,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "DESKTOP-gnome",
+    "ENV-DISTRI-rocky",
+    "browser_launcher",
+    "firefox_launcher"
+  ]
+}

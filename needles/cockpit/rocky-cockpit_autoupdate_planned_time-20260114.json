@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "xpos": 865,
+      "width": 57,
+      "ypos": 278,
+      "type": "match",
+      "height": 18
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "autoupdate_planned_time"
+  ]
+}

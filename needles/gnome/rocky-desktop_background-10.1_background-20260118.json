@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "xpos": 0,
+      "ypos": 32,
+      "width": 1024,
+      "height": 736,
+      "type": "match"
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "10.1_background",
+    "ENV-DISTRI-rocky"
+  ]
+}

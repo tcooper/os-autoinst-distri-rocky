@@ -14,27 +14,33 @@ sub _pxe_setup {
     # set up PXE server (via dnsmasq). Not used for update tests.
     # don't get hung up on slow mirrors when DNFing...
     repos_mirrorlist;
+
     # create necessary dirs
     assert_script_run "mkdir -p /var/lib/tftpboot/rocky";
+
     # basic tftp config
     assert_script_run "printf 'enable-tftp\ntftp-root=/var/lib/tftpboot\ntftp-secure\n' >> /etc/dnsmasq.conf";
+
     # pxe boot config
     # we boot grub directly not shim on aarch64 as shim fails to boot
     # with 'Synchronous Exception'
     # https://bugzilla.redhat.com/show_bug.cgi?id=1592148
-    assert_script_run "printf 'dhcp-match=set:efi-x86_64,option:client-arch,7\ndhcp-match=set:efi-x86_64,option:client-arch,9\ndhcp-match=set:bios,option:client-arch,0\ndhcp-match=set:efi-aarch64,option:client-arch,11\ndhcp-match=set:ppc64,option:client-arch,12\ndhcp-match=set:ppc64,option:client-arch,13\ndhcp-boot=tag:efi-x86_64,\"shim.efi\"\ndhcp-boot=tag:bios,\"pxelinux.0\"\ndhcp-boot=tag:efi-aarch64,\"grubaa64.efi\"\ndhcp-boot=tag:ppc64,\"boot/grub2/powerpc-ieee1275/core.elf\"\n' >> /etc/dnsmasq.conf";
+    assert_script_run "printf 'dhcp-match=set:efi-x86_64,option:client-arch,7\ndhcp-match=set:efi-x86_64,option:client-arch,9\ndhcp-match=set:bios,option:client-arch,0\ndhcp-match=set:efi-aarch64,option:client-arch,11\ndhcp-match=set:ppc64,option:client-arch,12\ndhcp-match=set:ppc64,option:client-arch,13\ndhcp-boot=tag:efi-x86_64,\"shimx64.efi\"\ndhcp-boot=tag:bios,\"pxelinux.0\"\ndhcp-boot=tag:efi-aarch64,\"grubaa64.efi\"\ndhcp-boot=tag:ppc64,\"boot/grub2/powerpc-ieee1275/core.elf\"\n' >> /etc/dnsmasq.conf";
+
     # install and configure bootloaders
     my $ourversion = get_var("CURRREL");
     my $contentdir = get_var("DNF_CONTENTDIR");
     my $testversion = get_var("RELEASE");
     assert_script_run "mkdir -p /var/tmp/rocky";
-    my $arch = get_var("ARCH");
 
+    my $arch = get_var("ARCH");
     if ($arch eq 'x86_64') {
         # x86_64: use syslinux for BIOS, grub2 with 'linuxefi' for UEFI
         assert_script_run "mkdir -p /var/lib/tftpboot/pxelinux.cfg";
+
         # install bootloader packages
         assert_script_run "dnf -y install syslinux", 120;
+
         # selinux compatible fcontext config required
         assert_script_run "dnf -y install policycoreutils-python-utils", 120;
         assert_script_run "semanage fcontext -a -e /var/lib/rpm /var/tmp/rocky", 60;
@@ -67,11 +73,14 @@ sub _pxe_setup {
         # copy bootloader files to tftp root
         assert_script_run "cp /usr/share/syslinux/{pxelinux.0,vesamenu.c32,ldlinux.c32,libcom32.c32,libutil.c32} /var/lib/tftpboot";
         assert_script_run "cp /var/tmp/rocky/boot/efi/EFI/rocky/{shimx64.efi,shimx64-rocky.efi,grubx64.efi} /var/lib/tftpboot";
+
         # bootloader configs
         # BIOS
         assert_script_run "printf 'default vesamenu.c32\nprompt 1\ntimeout 600\n\nlabel linux\n  menu label ^Install Rocky Linux 64-bit\n  menu default\n  kernel rocky/vmlinuz\n  append initrd=rocky/initrd.img inst.ks=file:///ks.cfg ip=dhcp\nlabel local\n  menu label Boot from ^local drive\n  localboot 0xffff\n' >> /var/lib/tftpboot/pxelinux.cfg/default";
+
         # UEFI
         assert_script_run "printf 'function load_video {\n  insmod efi_gop\n  insmod efi_uga\n  insmod ieee1275_fb\n  insmod vbe\n  insmod vga\n  insmod video_bochs\n  insmod video_cirrus\n}\n\nload_video\nset gfxpayload=keep\ninsmod gzio\n\nmenuentry \"Install Rocky Linux 64-bit\"  --class rocky --class gnu-linux --class gnu --class os {\n  linuxefi rocky/vmlinuz ip=dhcp inst.ks=file:///ks.cfg\n  initrdefi rocky/initrd.img\n}' >> /var/lib/tftpboot/grub.cfg";
+
         # DEBUG DEBUG
         upload_logs "/etc/dnsmasq.conf";
         upload_logs "/var/lib/tftpboot/grub.cfg";
@@ -82,10 +91,13 @@ sub _pxe_setup {
         # ppc64le: use grub2 for OFW
         # install bootloader tools package
         assert_script_run "dnf -y install grub2-tools-extra", 360;
+
         # install a network bootloader to tftp root
         assert_script_run "grub2-mknetdir --net-directory=/var/lib/tftpboot";
+
         # bootloader config
         assert_script_run "printf 'set default=0\nset timeout=5\n\nmenuentry \"Install Rocky Linux\"  --class rocky --class gnu-linux --class gnu --class os {\n  linux rocky/vmlinuz ip=dhcp inst.ks=file:///ks.cfg\n  initrd rocky/initrd.img\n}' >> /var/lib/tftpboot/boot/grub2/grub.cfg";
+
         # DEBUG DEBUG
         upload_logs "/etc/dnsmasq.conf";
         upload_logs "/var/lib/tftpboot/boot/grub2/grub.cfg";
@@ -96,8 +108,10 @@ sub _pxe_setup {
         # copy bootloader files to tftp root (we just use the system
         # bootloader, no need to install packages)
         assert_script_run "cp /boot/efi/EFI/rocky/{shim.efi,grubaa64.efi} /var/lib/tftpboot";
+
         # bootloader config
         assert_script_run "printf 'function load_video {\n  insmod efi_gop\n  insmod efi_uga\n  insmod ieee1275_fb\n  insmod vbe\n  insmod vga\n  insmod video_bochs\n  insmod video_cirrus\n}\n\nload_video\nset gfxpayload=keep\ninsmod gzio\n\nmenuentry \"Install Rocky Linux\"  --class rocky --class gnu-linux --class gnu --class os {\n  linux rocky/vmlinuz ip=dhcp inst.ks=file:///ks.cfg\n  initrd rocky/initrd.img\n}' >> /var/lib/tftpboot/grub.cfg";
+
         # DEBUG DEBUG
         upload_logs "/etc/dnsmasq.conf";
         upload_logs "/var/lib/tftpboot/grub.cfg";
@@ -106,27 +120,38 @@ sub _pxe_setup {
     # download kernel and initramfs
     my $location = get_var("LOCATION");
     my $kernpath = "images/pxeboot";
+
     # for some crazy reason these are in a different place for ppc64
     $kernpath = "ppc/ppc64" if ($arch eq 'ppc64le');
     assert_script_run "curl -o /var/lib/tftpboot/rocky/vmlinuz $location/BaseOS/${arch}/os/${kernpath}/vmlinuz";
     assert_script_run "curl -o /var/lib/tftpboot/rocky/initrd.img $location/BaseOS/${arch}/os/${kernpath}/initrd.img";
+
+    # extract our IP from POST_STATIC
+    my $poststatic = get_var("POST_STATIC");
+    my $ip = substr($poststatic, 0, index($poststatic, " "));
+
     # get a kickstart to embed in the initramfs, for testing:
     # https://fedoraproject.org/wiki/QA:Testcase_Kickstart_File_Path_Ks_Cfg
     assert_script_run "curl -o ks.cfg https://git.rockylinux.org/tcooper/kickstarts/-/raw/main/root-user-crypted-net.ks";
+
     # tweak the repo config in it
-    assert_script_run "sed -i -e 's,^url.*,nfs --server=nfs://172.16.2.110 --dir=/repo,g' ks.cfg";
+    assert_script_run "sed -i -e 's,^url.*,nfs --server $ip --dir /repo --opts nfsvers=4,g' ks.cfg";
+
     # embed it
     assert_script_run "echo ks.cfg | cpio -c -o >> /var/lib/tftpboot/rocky/initrd.img";
+
     # chown root
     assert_script_run "chown -R dnsmasq /var/lib/tftpboot";
     assert_script_run "restorecon -vr /var/lib/tftpboot";
+
     # open firewall ports
-    assert_script_run "firewall-cmd --add-service=tftp";
+    assert_script_run "firewall-cmd --permanent --add-service=tftp";
 }
 
 sub run {
     my $self = shift;
     my $contentdir = get_var("DNF_CONTENTDIR");
+
     # disable systemd-resolved, it conflicts with dnsmasq
     unless (script_run "systemctl is-active systemd-resolved.service") {
         script_run "systemctl stop systemd-resolved.service";
@@ -134,14 +159,19 @@ sub run {
         script_run "rm -f /etc/resolv.conf";
         script_run "systemctl restart NetworkManager";
     }
+
     ## DNS / DHCP (dnsmasq)
+
     # create config
     assert_script_run "printf 'domain=test.openqa.rockylinux.org\ndhcp-range=172.16.2.150,172.16.2.199\ndhcp-option=option:router,172.16.2.2\n' > /etc/dnsmasq.conf";
+
     # do PXE setup if this is not an update test
     _pxe_setup() unless (get_var("ADVISORY_OR_TASK"));
+
     # open firewall ports
-    assert_script_run "firewall-cmd --add-service=dhcp";
-    assert_script_run "firewall-cmd --add-service=dns";
+    assert_script_run "firewall-cmd --permanent --add-service=dhcp";
+    assert_script_run "firewall-cmd --permanent --add-service=dns";
+
     # start server
     assert_script_run "systemctl restart dnsmasq.service";
     assert_script_run "systemctl is-active dnsmasq.service";
@@ -157,8 +187,9 @@ sub run {
     assert_script_run "targetcli /iscsi/iqn.2016-06.local.domain:support.target1/tpg1/acls/iqn.2016-06.local.domain:support.target1 set auth userid=test password=weakpassword";
     assert_script_run "targetcli /iscsi/iqn.2016-06.local.domain:support.target1/tpg1/luns create /backstores/block/vdb";
     assert_script_run "targetcli / saveconfig";
+
     # open firewall port
-    assert_script_run "firewall-cmd --add-port=3260/tcp";
+    assert_script_run "firewall-cmd --permanent --add-port=3260/tcp";
     assert_script_run "systemctl restart target.service";
     assert_script_run "systemctl is-active target.service";
 
@@ -166,6 +197,7 @@ sub run {
 
     # create the file share
     assert_script_run "mkdir -p /export";
+
     # get the kickstart or kickstart template and replace content
     if ($contentdir) {
         my $releasever = get_var("DNF_RELEASEVAR");
@@ -180,28 +212,39 @@ sub run {
     } else {
         assert_script_run "curl -o /export/root-user-crypted-net.ks https://git.rockylinux.org/tcooper/kickstarts/-/raw/main/root-user-crypted-net.ks";
     }
+
     # for update tests, set up the update repository and export it
     if (get_var("ADVISORY_OR_TASK")) {
         assert_script_run "echo '/opt/update_repo 172.16.2.0/24(ro)' >> /etc/exports";
     }
+
     # for compose tests, we do all this stuff
     else {
         # create the repo share
         assert_script_run "mkdir -p /repo";
+
         # create a mount point for the ISO
         assert_script_run "mkdir -p /mnt/iso";
+
         # mount the ISO there
         assert_script_run "mount /dev/cdrom /mnt/iso";
+
         # copy the contents of the ISO to the repo share
         assert_script_run "dnf -y install rsync", 180;
         assert_script_run "rsync -av /mnt/iso/ /repo", 360;
+
         # put the updates image in the NFS repo (for testing this update
         # image delivery method)
+        # TODO: Create our own patch for anaconda to remove upstream dependency. NOTE: updates.img modified Anaconda
+        #       disk_partitioning screens and is also used in tests that have TEST_UPDATES=1 defined in templates.fif.json.
         assert_script_run "curl -o /repo/images/updates.img https://fedorapeople.org/groups/qa/updates/updates-openqa.img";
+
         # create the iso share
         assert_script_run "mkdir -p /iso";
+
         # recreate an iso file
         copy_devcdrom_as_isofile('/iso/image.iso');
+
         # set up the exports
         assert_script_run "printf '/export 172.16.2.0/24(ro)\n/repo 172.16.2.0/24(ro)\n/iso 172.16.2.0/24(ro)' > /etc/exports";
     }
@@ -210,9 +253,13 @@ sub run {
     assert_script_run "printf '[lockd]\nport=5555\n\n[statd]\nport=6666\n' > /etc/nfs.conf";
 
     # configure firewall
-    assert_script_run "firewall-cmd --add-service={nfs,rpc-bind,mountd}";
-    assert_script_run "firewall-cmd --add-port={5555/tcp,5555/udp,6666/tcp,6666/udp}";
+    assert_script_run "firewall-cmd --permanent --add-service={nfs,rpc-bind,mountd}";
+    assert_script_run "firewall-cmd --permanent --add-port={5555/tcp,5555/udp,6666/tcp,6666/udp}";
     assert_script_run "firewall-cmd --reload";
+
+    # debug output
+    assert_script_run "firewall-cmd --list-services";
+    assert_script_run "firewall-cmd --list-ports";
 
     # start the server
     assert_script_run "systemctl restart nfs-server.service";
@@ -221,6 +268,7 @@ sub run {
     # report ready, wait for children
     mutex_create('support_ready');
     wait_for_children;
+
     # upload logs in case of child failures
     $self->post_fail_hook();
 }

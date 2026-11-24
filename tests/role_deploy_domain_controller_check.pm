@@ -26,15 +26,15 @@ sub run {
     # there are often cases where we need to see the logs (e.g. client
     # test failed due to server issue)
     $self->post_fail_hook();
-    assert_script_run 'systemctl stop ipa.service';
+    assert_script_run 'systemctl stop ipa.service', 300;
     # check server is stopped
     assert_script_run '! systemctl is-active ipa.service';
     # decommission the server
     assert_script_run 'ipa-server-install -U --uninstall', 300;
     # try and un-garble the screen that the above sometimes garbles
     # ...we may be on tty1 or tty3 now, so flip between them
-    send_key "ctrl-alt-f1";
-    send_key "ctrl-alt-f3";
+    select_console "tty1-console";
+    select_console "tty3-console";
     # FIXME check server is decommissioned...how?
 }
 

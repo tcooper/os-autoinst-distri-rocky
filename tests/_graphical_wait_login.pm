@@ -1,7 +1,26 @@
 use base "installedtest";
 use strict;
 use testapi;
+use anaconda;
 use utils;
+
+sub _enter_password {
+    my $password = shift;
+    if (get_var("SWITCHED_LAYOUT")) {
+        # see _do_install_and_reboot; when layout is switched
+        # see _do_root_and_user; when layout is switched
+        # user password is doubled to contain both US and native
+        # chars
+        desktop_switch_layout 'ascii';
+        type_very_safely $password;
+        desktop_switch_layout 'native';
+        type_very_safely $password;
+    }
+    else {
+        type_very_safely $password;
+    }
+    send_key "ret";
+}
 
 sub run {
     my $self = shift;
@@ -78,19 +97,7 @@ sub run {
         # seems like we often double-type on aarch64 if we start right
         # away
         wait_still_screen 5;
-        if (get_var("SWITCHED_LAYOUT")) {
-            # see _do_install_and_reboot; when layout is switched
-            # user password is doubled to contain both US and native
-            # chars
-            desktop_switch_layout 'ascii';
-            type_very_safely $password;
-            desktop_switch_layout 'native';
-            type_very_safely $password;
-        }
-        else {
-            type_very_safely $password;
-        }
-        send_key "ret";
+        _enter_password($password);
     }
 
     # Welcome tour is here...
@@ -114,9 +121,11 @@ sub run {
             handle_welcome_screen unless (get_var("_WELCOME_DONE"));
         }
     }
-    if (get_version_major() > 8) {
-        handle_welcome_screen unless (get_var("_WELCOME_DONE"));
-    }
+    # FIXME: Figure out why this was added. seems to be handled above. inclusion
+    # causes soft-fail.
+    #if (get_version_major() > 8) {
+    #    handle_welcome_screen unless (get_var("_WELCOME_DONE"));
+    #}
     if (get_var("DESKTOP") eq 'gnome' && get_var("INSTALL_NO_USER")) {
         # handle welcome screen if we didn't do it above (holy flow
         # control, Batman!)
@@ -124,7 +133,7 @@ sub run {
         # if this was an image deployment, we also need to create
         # root user now, for subsequent tests to work
         if (get_var("IMAGE_DEPLOY")) {
-            send_key "ctrl-alt-f3";
+            select_console "tty3-console";
             console_login(user => get_var("USER_LOGIN", "test"), password => get_var("USER_PASSWORD", "weakpassword"));
             type_string "sudo su\n";
             type_string "$password\n";

@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "xpos": 486,
+      "width": 18,
+      "ypos": 326,
+      "type": "match",
+      "height": 64
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "clocks_city_details"
+  ]
+}

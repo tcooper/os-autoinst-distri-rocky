@@ -1,0 +1,17 @@
+{
+  "area": [
+    {
+      "xpos": 120,
+      "type": "match",
+      "ypos": 11,
+      "width": 16,
+      "height": 20
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "LANGUAGE-arabic",
+    "gnome_layout_native"
+  ]
+}

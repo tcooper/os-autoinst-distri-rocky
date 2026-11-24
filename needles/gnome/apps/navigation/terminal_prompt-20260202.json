@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "width": 123,
+      "type": "match",
+      "ypos": 161,
+      "height": 18,
+      "xpos": 189
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "terminal_prompt"
+  ]
+}

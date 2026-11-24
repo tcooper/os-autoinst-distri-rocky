@@ -1,0 +1,16 @@
+{
+  "area": [
+    {
+      "xpos": 332,
+      "ypos": 246,
+      "type": "match",
+      "height": 26,
+      "width": 72
+    }
+  ],
+  "properties": [],
+  "tags": [
+    "ENV-DISTRI-rocky",
+    "gnome_city_button_reykjavik"
+  ]
+}

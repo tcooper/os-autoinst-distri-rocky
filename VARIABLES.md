@@ -60,6 +60,7 @@ it also means that `B` conflicts `A` even if not shown in the table).
 | `ENTRYPOINT` | filename | not set | N/A | set `ENTRYPOINT` to load specific test directly (bypass modular structure, mainly usable for testing). If you want to run more than one test, separate them with space. |
 | `UPGRADE` | string (`minimal`, `desktop`, `encrypted`, ...) | not set | all except of `LIVE` and `USER_PASSWORD` | when set, do an upgrade test of specified type |
 | `KICKSTART` | boolean | `false`/not set | all | when specified, do an kickstart installation (you should use `GRUB` variable to specify where kickstart file resides) |
+| `PARTIAL_KICKSTART` | boolean | `false`/not set | all | when specified, do a partial kickstart installation - the kickstart is expected to omit package set configuration (you should use `GRUB` variable to specify where kickstart file resides) |
 | `MIRRORLIST_GRAPHICAL` | boolean | `false`/not set | `REPOSITORY_GRAPHICAL` | sets installation source to mirrorlist |
 | `REPOSITORY_GRAPHICAL` | url to repository (without arch and `/os`, for example `http://dl.rockylinux.org/pub/rocky/linux/development`) | not set | `MIRRORLIST_GRAPHICAL` | sets installation source to repository url in Anaconda |
 | `REPOSITORY_VARIATION` | url to repository (without arch and `/os`, for example `http://dl.rockylinux.org/pub/rocky/linux/development`) | not set | nothing | sets installation source to repository url in GRUB |
@@ -86,6 +87,8 @@ it also means that `B` conflicts `A` even if not shown in the table).
 | `BUGZILLA_LOGIN` | string | not set | used with `_SECRET_BUGZILLA_PASSWORD` | This is used to store a login string which does not get exposed in log files. |
 | `_SECRET_BUGZILLA_PASSWORD` | string | not set | used with `BUGZILLA_LOGIN` | This is used to store a password string which does not get exposed in log files. |
 | `_SECRET_BUGZILLA_APIKEY` | string | not set | used with other secrets | This is used to store an API key which does not get exposed in log files. |
+| `GNOME_DESKTOP_SESSION_IDLE_DELAY` | string | not set | This is used if alternate setting for `org.gnome.desktop.session idle-delay` is desired. |
+| `GNOME_DESKTOP_SCREENSAVER_LOCK_ENABLED` | string | not set | This is used if alternate setting for `org.gnome.desktop.screensaver lock-enabled` is desired. |
 
 Run variables
 -------------

@@ -1,6 +1,9 @@
 use base "anacondatest";
 use strict;
 use testapi;
+use anaconda;
+use utils;
+
 
 sub run {
     my $self = shift;
@@ -17,8 +20,11 @@ sub run {
             $env = "server-product-environment";
         }
 
-        assert_script_run "egrep 'selected environment:' /tmp/anaconda.log /tmp/packaging.log | tail -1 | grep $env";
-        send_key "ctrl-alt-f6";
+        # In rocky 10 default Software Selection is server with GUI (and group base-graphical is hidden) so this is superfluous
+        if (get_version_major() < 10) {
+            assert_script_run "grep -E 'selected environment:' /tmp/anaconda.log /tmp/packaging.log | tail -1 | grep $env";
+        }
+        select_console "tty6-console";
         assert_screen "anaconda_main_hub", 30;
         return;
     }
